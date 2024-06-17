@@ -1,0 +1,10 @@
+wifi_ssid: "your_wifi_ssid"
+wifi_password: "your_wifi_password"
+max_wifi_connect_attempts_before_resetting_device: 10
+home_assistant_url: "http://homeassistant.local:8123/"
+home_assistant_bearer_token: "your_home_assistant_bearer_token"
+home_assistant_entity_id: "sensor.smart_mailbox"
+home_assistant_unique_id: "1234567890-smart_mailbox"
+consecutive_tilt_sensor_active_needed_to_trigger: 10
+consecutive_lid_open_needed_to_trigger: 10
+consecutive_bottom_sensor_active_needed_to_trigger: 5
