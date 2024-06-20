@@ -18,6 +18,7 @@ led_on_board: Pin = Pin("LED", Pin.OUT)
 led_green: Pin = Pin(13, Pin.OUT)
 led_yellow: Pin = Pin(14, Pin.OUT)
 led_red: Pin = Pin(15, Pin.OUT)
+output_pins = [led_on_board, led_green, led_yellow, led_red]
 buzzer: Pin = Pin(16, Pin.OUT)
 
 # Define the pins for input
@@ -58,6 +59,7 @@ consecutive_bottom_sensor_active_needed_to_trigger: int = settings.get(
     'consecutive_bottom_sensor_active_needed_to_trigger', 10)
 max_wifi_connect_attempts_before_resetting_device: int = settings.get(
     'max_wifi_connect_attempts_before_resetting_device', 10)
+
 """
 assert ssid != 'your_ssid', f"Please set your WiFi SSID in {settings_file_name}" # noqa
 assert password != 'your_password', f"Please set your WiFi password in {settings_file_name}"  # noqa
@@ -67,8 +69,8 @@ assert home_assistant_entity_id != 'not_set', f"Please set your Home Assistant E
 """
 
 
-def set_putput_pins(to_low: bool = True, to_high: bool = False) -> None:
-    for pin in [led_on_board, led_green, led_yellow, led_red, buzzer]:
+def set_all_output_pins(to_low: bool = True, to_high: bool = False) -> None:
+    for pin in output_pins:
         if to_low:
             pin.low()
         elif to_high:
@@ -113,11 +115,20 @@ def cycle_lights(cycles: int = 5) -> None:
 
 def signal_error(error_code: int = 1) -> None:
     print(f"Signaling error code: {error_code}")
-    buzz_buzzer(2)
+    buzz_buzzer(5)
     flash_led(led_on_board, 5)
-    buzz_buzzer(2)
+    buzz_buzzer(5)
     slow_flash_led(led_on_board, error_code)
     print(f"Signaling error code: {error_code} done")
+
+
+def signal_success(success_code: int = 1) -> None:
+    print(f"Signaling success")
+    buzz_buzzer(2, buzz_duration=0.05)
+    flash_led(led_on_board, 2)
+    buzz_buzzer(2, buzz_duration=0.05)
+    slow_flash_led(led_on_board, success_code)
+    print(f"Signaling success done")
 
 
 def connect() -> network.WLAN:
@@ -142,9 +153,8 @@ def connect() -> network.WLAN:
             print("Resetting the device")
             machine.reset()
     print(wlan.ifconfig())
-    flash_led(led_on_board, 5)
+    signal_success(2)
     led_on_board.high()
-    buzz_buzzer(5)
     print(f"Connected to WiFi: {ssid}")
     return wlan
 
@@ -222,7 +232,7 @@ def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
 
 def main():
     global has_mail_been_delivered, reset_sensor_active, tilt_sensor_active, bottom_sensor_active, lid_open, previous_has_mail_been_delivered
-    set_putput_pins(to_low=True)
+    set_all_output_pins(to_low=True)
     cycle_lights()
 
     try:
@@ -304,5 +314,6 @@ def main():
         print(f"sensor_tilt_2.value(): {sensor_tilt_2.value()}")
         print(f"sensor_reset.value(): {sensor_reset.value()}")
         counter += 1
+
 
 main()
