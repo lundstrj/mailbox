@@ -1,5 +1,5 @@
 import time
-from machine import Pin, Timer
+from machine import Pin
 import network
 import urequests
 import ujson
@@ -11,6 +11,7 @@ import yaml
 ERROR_CODE_WIFI_NOT_CONNECTED = 2
 ERROR_CODE_HOME_ASSISTANT_NOT_CONNECTED = 4
 ERROR_CODE_KEYBOARD_INTERRUPT = 6
+ERROR_CODE_WIFI_NOT_CONFIGURED = 8
 
 # Define the pins for output
 led_on_board: Pin = Pin("LED", Pin.OUT)
@@ -75,24 +76,25 @@ def set_putput_pins(to_low: bool = True, to_high: bool = False) -> None:
 
 
 def flash_led(led: Pin, flashes: int = 5, flash_duration: float = 0.1) -> None:
+    print(f'flashing led: {flashes} times for {flash_duration} seconds each')
     for i in range(flashes):
         led.high()
         time.sleep(flash_duration)
         led.low()
+    print('flashing led: done')
 
 
 def slow_flash_led(led: Pin, flashes: int = 5, flash_duration: float = 1) -> None:
-    for i in range(flashes):
-        led.high()
-        time.sleep(flash_duration)
-        led.low()
+    flash_led(led, flashes, flash_duration)
 
 
-def buzz_buzzer(buzzes: int = 5) -> None:
+def buzz_buzzer(buzzes: int = 5, buzz_duration: float = 0.1) -> None:
+    print(f'buzzing the buzzer: {buzzes} times for {buzz_duration} seconds each')
     for i in range(buzzes):
         buzzer.high()
-        time.sleep(0.1)
+        time.sleep(buzz_duration)
         buzzer.low()
+    print('buzzing the buzzer: done')
 
 
 def cycle_lights(cycles: int = 5) -> None:
@@ -110,22 +112,24 @@ def cycle_lights(cycles: int = 5) -> None:
 
 
 def signal_error(error_code: int = 1) -> None:
+    print(f"Signaling error code: {error_code}")
     buzz_buzzer(2)
     flash_led(led_on_board, 5)
     buzz_buzzer(2)
     slow_flash_led(led_on_board, error_code)
+    print(f"Signaling error code: {error_code} done")
 
 
 def connect() -> network.WLAN:
+    print(f"Connecting to WiFi: {ssid}")
     if ssid == 'ssid_not_set' or password == 'password_not_set':  # noqa
-        signal_error(ERROR_CODE_WIFI_NOT_CONNECTED)
-        raise ValueError("Please set your WiFi SSID and password in settings.yaml")
+        signal_error(ERROR_CODE_WIFI_NOT_CONFIGURED)
+        raise ValueError(f"Please set your WiFi SSID and password in {settings_file_name}")
     # Connect to WLAN
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     wlan.connect(ssid, password)
     attempts = 0
-    max_attempts = 20
     while wlan.isconnected() == False:
         print('Waiting for connection...')
         sleep(1)
@@ -134,23 +138,15 @@ def connect() -> network.WLAN:
         if attempts > max_wifi_connect_attempts_before_resetting_device:
             print(
                 f"Could not connect to WiFi (after {attempts} attempts), please check your {settings_file_name} file and wifi status")
-            flash_led(led_on_board, 20)
+            signal_error(ERROR_CODE_WIFI_NOT_CONNECTED)
             print("Resetting the device")
             machine.reset()
     print(wlan.ifconfig())
     flash_led(led_on_board, 5)
     led_on_board.high()
     buzz_buzzer(5)
+    print(f"Connected to WiFi: {ssid}")
     return wlan
-
-
-def get_pico_temp() -> float:
-    try:
-        temp = 24.3
-        return temp
-    except Exception as e:
-        print(f"Error: {e}")
-        return 0.0
 
 
 def send_telemetry_to_ha(mail_has_been_delivered: bool) -> None:
@@ -181,6 +177,7 @@ def send_telemetry_to_ha(mail_has_been_delivered: bool) -> None:
     json = ujson.dumps(data).encode('utf-8')
     url = f"{home_assistant_url}api/states/{home_assistant_entity_id}"
     response = urequests.post(url, data=json, headers=headers)
+    print(f"Response from Home Assistant: {response.status_code}")
     print(response.text)
 
 
@@ -191,6 +188,7 @@ def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
         'bottom_sensor_active': bottom_sensor_active,
         'tilt_sensor_active': tilt_sensor_active}
     """
+    print(f"Checking if mail has been delivered")
     consecutive_tilt_sensor_active = 0
     consecutive_lid_open = 0
     consecutive_bottom_sensor_active = 0
@@ -216,89 +214,95 @@ def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
         if (consecutive_tilt_sensor_active > consecutive_tilt_sensor_active_needed_to_trigger
                 or consecutive_lid_open > consecutive_lid_open_needed_to_trigger
                 or consecutive_bottom_sensor_active > consecutive_bottom_sensor_active_needed_to_trigger):
+            print(f"Mail has been delivered")
             return True
+    print(f"Mail has not been delivered")
     return False
 
 
-set_putput_pins(to_low=True)
-cycle_lights()
+def main():
+    global has_mail_been_delivered, reset_sensor_active, tilt_sensor_active, bottom_sensor_active, lid_open, previous_has_mail_been_delivered
+    set_putput_pins(to_low=True)
+    cycle_lights()
 
-try:
-    print("Trying to connect to WLAN")
-    connect()
-    print("Connected to WLAN")
-except KeyboardInterrupt:
-    print("KeyboardInterrupt")
-    signal_error(ERROR_CODE_KEYBOARD_INTERRUPT)
-    machine.reset()
-except ValueError as e:
-    print(f"ValueError: {e}")
-    led_on_board.high()
-    machine.reset()
+    try:
+        print("Trying to connect to WLAN")
+        connect()
+        print("Connected to WLAN")
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt")
+        signal_error(ERROR_CODE_KEYBOARD_INTERRUPT)
+        machine.reset()
+    except ValueError as e:
+        print(f"ValueError: {e}")
+        led_on_board.high()
+        machine.reset()
 
-counter = 0
-past_50_samples = []
-while True:
-    time.sleep(0.5)
-    if sensor_lid.value():
-        print("Lid is open")
-        lid_open = True
-        led_yellow.high()
-    elif not sensor_lid.value():
-        print("Lid is closed")
-        lid_open = False
-        led_yellow.low()
-    if not sensor_bottom.value():
-        print("sensor_bottom is active")
-        bottom_sensor_active = True
-        led_red.high()
-    elif sensor_bottom.value():
-        print("sensor_bottom is inactive")
-        bottom_sensor_active = False
-        led_red.low()
-    if sensor_tilt_2.value():
-        print("sensor_tilt_2 is active")
-        tilt_sensor_active = True
-        led_green.high()
-    elif not sensor_tilt_2.value():
-        print("sensor_tilt_2 is inactive")
-        tilt_sensor_active = False
-        led_green.low()
-    if not sensor_reset.value():
-        print("sensor_reset is active")
-        reset_sensor_active = True
+    counter = 0
+    past_50_samples = []
+    while True:
+        time.sleep(0.5)
+        if sensor_lid.value():
+            print("Lid is open")
+            lid_open = True
+            led_yellow.high()
+        elif not sensor_lid.value():
+            print("Lid is closed")
+            lid_open = False
+            led_yellow.low()
+        if not sensor_bottom.value():
+            print("sensor_bottom is active")
+            bottom_sensor_active = True
+            led_red.high()
+        elif sensor_bottom.value():
+            print("sensor_bottom is inactive")
+            bottom_sensor_active = False
+            led_red.low()
+        if sensor_tilt_2.value():
+            print("sensor_tilt_2 is active")
+            tilt_sensor_active = True
+            led_green.high()
+        elif not sensor_tilt_2.value():
+            print("sensor_tilt_2 is inactive")
+            tilt_sensor_active = False
+            led_green.low()
+        if not sensor_reset.value():
+            print("sensor_reset is active")
+            reset_sensor_active = True
+            if has_mail_been_delivered:
+                print("#" * 50)
+                print("Resetting mail delivery status")
+                print("#" * 50)
+                has_mail_been_delivered = False
+                past_50_samples = []
+        elif sensor_reset.value():
+            print("sensor_reset is inactive")
+            reset_sensor_active = False
+        past_50_samples.append({'counter': counter,
+                                'lid_open': lid_open,
+                                'bottom_sensor_active': bottom_sensor_active,
+                                'tilt_sensor_active': tilt_sensor_active,
+                                'reset_sensor_active': reset_sensor_active})
+        if len(past_50_samples) > 50:
+            past_50_samples.pop(0)
+        if not has_mail_been_delivered:
+            has_mail_been_delivered = check_if_mail_has_been_delivered(past_50_samples)
+            if has_mail_been_delivered:
+                print("New mail has been delivered")
+                print("Sound the buzzer 5x once")
+                buzz_buzzer(5)
         if has_mail_been_delivered:
-            print("#" * 50)
-            print("Resetting mail delivery status")
-            print("#" * 50)
-            has_mail_been_delivered = False
-            past_50_samples = []
-    elif sensor_reset.value():
-        print("sensor_reset is inactive")
-        reset_sensor_active = False
-    past_50_samples.append({'counter': counter,
-                            'lid_open': lid_open,
-                            'bottom_sensor_active': bottom_sensor_active,
-                            'tilt_sensor_active': tilt_sensor_active,
-                            'reset_sensor_active': reset_sensor_active})
-    if len(past_50_samples) > 50:
-        past_50_samples.pop(0)
-    if not has_mail_been_delivered:
-        has_mail_been_delivered = check_if_mail_has_been_delivered(past_50_samples)
-        if has_mail_been_delivered:
-            print("New mail has been delivered")
-            print("Sound the buzzer 5x once")
-            buzz_buzzer(5)
-    if has_mail_been_delivered:
-        print("Mail is in the mailbox")
-        flash_led(led_on_board, 5)
-    if has_mail_been_delivered != previous_has_mail_been_delivered:
-        # we have a state change and should update Home Assistant
-        send_telemetry_to_ha(has_mail_been_delivered)
-    previous_has_mail_been_delivered = has_mail_been_delivered
-    print(f"counter: {counter}")
-    print(f"sensor_lid.value(): {sensor_lid.value()}")
-    print(f"sensor_bottom.value(): {sensor_bottom.value()}")
-    print(f"sensor_tilt_2.value(): {sensor_tilt_2.value()}")
-    print(f"sensor_reset.value(): {sensor_reset.value()}")
-    counter += 1
+            print("Mail is in the mailbox")
+            flash_led(led_on_board, 5)
+        if has_mail_been_delivered != previous_has_mail_been_delivered:
+            # we have a state change and should update Home Assistant
+            send_telemetry_to_ha(has_mail_been_delivered)
+        previous_has_mail_been_delivered = has_mail_been_delivered
+        print(f"counter: {counter}")
+        print(f"sensor_lid.value(): {sensor_lid.value()}")
+        print(f"sensor_bottom.value(): {sensor_bottom.value()}")
+        print(f"sensor_tilt_2.value(): {sensor_tilt_2.value()}")
+        print(f"sensor_reset.value(): {sensor_reset.value()}")
+        counter += 1
+
+main()
