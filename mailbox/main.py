@@ -49,7 +49,7 @@ consecutive_bottom_sensor_active_needed_to_trigger: int = settings.get(
 max_wifi_connect_attempts_before_resetting_device: int = settings.get(
     'max_wifi_connect_attempts_before_resetting_device', 10)
 sliding_window_size: int = settings.get('sliding_window_size', 300)
-sampling_interval: int = settings.get('sampling_interval', 0.5)
+sampling_interval: float = settings.get('sampling_interval', 0.5)
 
 led_green_pin = settings.get('led_green_pin', 'not_set')
 led_yellow_pin = settings.get('led_yellow_pin', 'not_set')
@@ -131,7 +131,7 @@ def has_bottom_sensor() -> bool:
     try:
         sensor_bottom.value()
         return True
-    except Exception as e:
+    except Exception:
         return False
 
 
@@ -139,7 +139,7 @@ def has_tilt_sensor() -> bool:
     try:
         sensor_tilt.value()
         return True
-    except Exception as e:
+    except Exception:
         return False
 
 
@@ -147,7 +147,7 @@ def has_lid_sensor() -> bool:
     try:
         sensor_lid.value()
         return True
-    except Exception as e:
+    except Exception:
         return False
 
 
@@ -155,7 +155,7 @@ def has_reset_sensor() -> bool:
     try:
         sensor_reset.value()
         return True
-    except Exception as e:
+    except Exception:
         return False
 
 
@@ -163,7 +163,7 @@ def has_wake_source() -> bool:
     try:
         wake_source.value()
         return True
-    except Exception as e:
+    except Exception:
         return False
 
 
@@ -235,14 +235,14 @@ def connect() -> network.WLAN:
         signal_error(ERROR_CODE_WIFI_NOT_CONFIGURED)
         raise ValueError(f"Please set your WiFi SSID and password in {settings_file_name}")
     # Connect to WLAN
-    wlan = network.WLAN(network.STA_IF)
+    wlan = network.WLAN(network.STA_IF)  # noqa
     wlan.active(True)
     wlan.connect(ssid, password)
     attempts = 0
-    while wlan.isconnected() == False:
+    while not wlan.isconnected():
         print('Waiting for connection...')
         sleep(1)
-        led_on_board.toggle()
+        led_on_board.toggle()  # noqa
         attempts += 1
         if attempts > max_wifi_connect_attempts_before_resetting_device:
             print(
@@ -284,7 +284,7 @@ def send_telemetry_to_ha(mail_has_been_delivered: bool) -> None:
 
     json = ujson.dumps(data).encode('utf-8')
     url = f"{home_assistant_url}api/states/{home_assistant_entity_id}"
-    response = urequests.post(url, data=json, headers=headers)
+    response = urequests.post(url, data=json, headers=headers)  # noqa
     print(f"Response from Home Assistant: {response.status_code}")
     print(response.text)
 
