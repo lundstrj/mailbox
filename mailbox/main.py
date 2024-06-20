@@ -131,7 +131,7 @@ def has_bottom_sensor() -> bool:
     try:
         sensor_bottom.value()
         return True
-    except Exception:
+    except AttributeError:
         return False
 
 
@@ -139,7 +139,7 @@ def has_tilt_sensor() -> bool:
     try:
         sensor_tilt.value()
         return True
-    except Exception:
+    except AttributeError:
         return False
 
 
@@ -147,7 +147,7 @@ def has_lid_sensor() -> bool:
     try:
         sensor_lid.value()
         return True
-    except Exception:
+    except AttributeError:
         return False
 
 
@@ -155,7 +155,7 @@ def has_reset_sensor() -> bool:
     try:
         sensor_reset.value()
         return True
-    except Exception:
+    except AttributeError:
         return False
 
 
@@ -163,7 +163,7 @@ def has_wake_source() -> bool:
     try:
         wake_source.value()
         return True
-    except Exception:
+    except AttributeError:
         return False
 
 
