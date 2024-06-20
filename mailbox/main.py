@@ -12,20 +12,9 @@ ERROR_CODE_WIFI_NOT_CONNECTED = 2
 ERROR_CODE_HOME_ASSISTANT_NOT_CONNECTED = 4
 ERROR_CODE_KEYBOARD_INTERRUPT = 6
 ERROR_CODE_WIFI_NOT_CONFIGURED = 8
+ERROR_CODE_NO_SENSORS_CONNECTED = 12
+GOING_TO_SLEEP = 10
 
-# Define the pins for output
-led_on_board: Pin = Pin("LED", Pin.OUT)
-led_green: Pin = Pin(13, Pin.OUT)
-led_yellow: Pin = Pin(14, Pin.OUT)
-led_red: Pin = Pin(15, Pin.OUT)
-output_pins = [led_on_board, led_green, led_yellow, led_red]
-buzzer: Pin = Pin(16, Pin.OUT)
-
-# Define the pins for input
-sensor_bottom: Pin = Pin(12, Pin.IN, pull=Pin.PULL_UP)
-sensor_tilt_2: Pin = Pin(11, Pin.IN, pull=Pin.PULL_UP)
-sensor_lid: Pin = Pin(10, Pin.IN, pull=Pin.PULL_UP)
-sensor_reset: Pin = Pin(9, Pin.IN, pull=Pin.PULL_UP)
 
 # Potentially useful globals
 has_mail_been_delivered: bool = False
@@ -59,6 +48,75 @@ consecutive_bottom_sensor_active_needed_to_trigger: int = settings.get(
     'consecutive_bottom_sensor_active_needed_to_trigger', 10)
 max_wifi_connect_attempts_before_resetting_device: int = settings.get(
     'max_wifi_connect_attempts_before_resetting_device', 10)
+sliding_window_size: int = settings.get('sliding_window_size', 300)
+sampling_interval: int = settings.get('sampling_interval', 0.5)
+
+led_green_pin = settings.get('led_green_pin', 'not_set')
+led_yellow_pin = settings.get('led_yellow_pin', 'not_set')
+led_red_pin = settings.get('led_red_pin', 'not_set')
+buzzer_pin = settings.get('buzzer_pin', 'not_set')
+
+# Define the pins for output
+led_on_board: Pin = Pin("LED", Pin.OUT)
+output_pins = [led_on_board]
+if led_green_pin != 'not_set':
+    print(f"led_green_pin: {led_green_pin}")
+    led_green: Pin = Pin(led_green_pin, Pin.OUT)
+    output_pins.append(led_green)
+else:
+    print(f"No led_green_pin set in {settings_file_name}")
+if led_yellow_pin != 'not_set':
+    print(f"led_yellow_pin: {led_yellow_pin}")
+    led_yellow: Pin = Pin(14, Pin.OUT)
+    output_pins.append(led_yellow)
+else:
+    print(f"No led_yellow_pin set in {settings_file_name}")
+if led_red_pin != 'not_set':
+    print(f"led_red_pin: {led_red_pin}")
+    led_red: Pin = Pin(15, Pin.OUT)
+    output_pins.append(led_red)
+else:
+    print(f"No led_red_pin set in {settings_file_name}")
+if buzzer_pin != 'not_set':
+    print(f"buzzer_pin: {buzzer_pin}")
+    buzzer: Pin = Pin(16, Pin.OUT)
+else:
+    print(f"No buzzer_pin set in {settings_file_name}")
+
+sensor_bottom_pin = settings.get('sensor_bottom_pin', 'not_set')
+sensor_tilt_pin = settings.get('sensor_tilt_pin', 'not_set')
+sensor_lid_pin = settings.get('sensor_lid_pin', 'not_set')
+sensor_reset_pin = settings.get('sensor_reset_pin', 'not_set')
+wake_source_pin = settings.get('wake_source_pin', 'not_set')
+
+# Define the pins for input
+if sensor_bottom_pin != 'not_set':
+    print(f"sensor_bottom_pin: {sensor_bottom_pin}")
+    sensor_bottom: Pin = Pin(sensor_bottom_pin, Pin.IN, pull=Pin.PULL_UP)
+else:
+    print(f"No sensor_bottom_pin set in {settings_file_name}")
+if sensor_tilt_pin != 'not_set':
+    print(f"sensor_tilt_pin: {sensor_tilt_pin}")
+    sensor_tilt: Pin = Pin(sensor_tilt_pin, Pin.IN, pull=Pin.PULL_UP)
+else:
+    print(f"No sensor_tilt_pin set in {settings_file_name}")
+if sensor_lid_pin != 'not_set':
+    print(f"sensor_lid_pin: {sensor_lid_pin}")
+    sensor_lid: Pin = Pin(sensor_lid_pin, Pin.IN, pull=Pin.PULL_UP)
+else:
+    print(f"No sensor_lid_pin set in {settings_file_name}")
+if sensor_reset_pin != 'not_set':
+    print(f"sensor_reset_pin: {sensor_reset_pin}")
+    sensor_reset: Pin = Pin(sensor_reset_pin, Pin.IN, pull=Pin.PULL_UP)
+else:
+    print(f"No sensor_reset_pin set in {settings_file_name}")
+if wake_source_pin != 'not_set':
+    print(f"wake_source_pin: {wake_source_pin}")
+    wake_source: Pin = Pin(wake_source_pin, Pin.IN, pull=Pin.PULL_UP)
+    wake_source.irq(trigger=Pin.IRQ_FALLING, handler=None, wake=(machine.DEEPSLEEP or machine.SLEEP or machine.IDLE))
+else:
+    print(f"No wake_source_pin set in {settings_file_name}")
+
 
 """
 assert ssid != 'your_ssid', f"Please set your WiFi SSID in {settings_file_name}" # noqa
@@ -67,6 +125,46 @@ assert home_assistant_token != 'your_token', f"Please set your Home Assistant Be
 assert home_assistant_unique_id != 'net_set', f"Please set your Home Assistant Unique ID in {settings_file_name}" # noqa
 assert home_assistant_entity_id != 'not_set', f"Please set your Home Assistant Entity ID in {settings_file_name}" # noqa
 """
+
+
+def has_bottom_sensor() -> bool:
+    try:
+        sensor_bottom.value()
+        return True
+    except Exception as e:
+        return False
+
+
+def has_tilt_sensor() -> bool:
+    try:
+        sensor_tilt.value()
+        return True
+    except Exception as e:
+        return False
+
+
+def has_lid_sensor() -> bool:
+    try:
+        sensor_lid.value()
+        return True
+    except Exception as e:
+        return False
+
+
+def has_reset_sensor() -> bool:
+    try:
+        sensor_reset.value()
+        return True
+    except Exception as e:
+        return False
+
+
+def has_wake_source() -> bool:
+    try:
+        wake_source.value()
+        return True
+    except Exception as e:
+        return False
 
 
 def set_all_output_pins(to_low: bool = True, to_high: bool = False) -> None:
@@ -102,10 +200,10 @@ def buzz_buzzer(buzzes: int = 5, buzz_duration: float = 0.1) -> None:
 def cycle_lights(cycles: int = 5) -> None:
     for i in range(cycles):
         print(f'toggling lights: {i}/{cycles}')
-        for led in [led_on_board, led_green, led_yellow, led_red]:
+        for led in output_pins:
             led.toggle()
             sleep(0.1)
-        leds = [led_on_board, led_green, led_yellow, led_red]
+        leds = output_pins.copy()
         leds.reverse()
         for led in leds:
             led.toggle()
@@ -123,12 +221,12 @@ def signal_error(error_code: int = 1) -> None:
 
 
 def signal_success(success_code: int = 1) -> None:
-    print(f"Signaling success")
+    print(f"Signaling success: {success_code}")
     buzz_buzzer(2, buzz_duration=0.05)
     flash_led(led_on_board, 2)
     buzz_buzzer(2, buzz_duration=0.05)
     slow_flash_led(led_on_board, success_code)
-    print(f"Signaling success done")
+    print(f"Signaling success: {success_code} done")
 
 
 def connect() -> network.WLAN:
@@ -208,17 +306,17 @@ def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
             previous_sample = sample
             continue
         if previous_sample is not None:
-            if sample['tilt_sensor_active'] and previous_sample['tilt_sensor_active']:
+            if sample.get('tilt_sensor_active', False) and previous_sample.get('tilt_sensor_active', False):
                 consecutive_tilt_sensor_active += 1
-            elif not sample['tilt_sensor_active']:
+            elif not sample.get('tilt_sensor_active', False):
                 consecutive_tilt_sensor_active = 0
-            if sample['lid_open'] and previous_sample['lid_open']:
+            if sample.get('lid_open', False) and previous_sample.get('lid_open', False):
                 consecutive_lid_open += 1
-            elif not sample['lid_open']:
+            elif not sample.get('lid_open', False):
                 consecutive_lid_open = 0
-            if sample['bottom_sensor_active'] and previous_sample['bottom_sensor_active']:
+            if sample.get('bottom_sensor_active', False) and previous_sample('bottom_sensor_active', False):
                 consecutive_bottom_sensor_active += 1
-            elif not sample['bottom_sensor_active']:
+            elif not sample.get('bottom_sensor_active', False):
                 consecutive_bottom_sensor_active = 0
             previous_sample = sample
         if (consecutive_tilt_sensor_active > consecutive_tilt_sensor_active_needed_to_trigger
@@ -230,11 +328,32 @@ def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
     return False
 
 
+def goto_sleep(duration: int = 0) -> None:
+    if duration > 0:
+        print(f"Going to sleep for {duration} seconds")
+        signal_success(GOING_TO_SLEEP)
+        machine.deepsleep(duration * 1000)
+    else:
+        if has_wake_source():
+            print("Going to deep sleep forever (until interrupted)")
+            signal_success(GOING_TO_SLEEP)
+            machine.deepsleep()
+        else:
+            print("Going to sleep for 20 hours (since there is no wake source)")
+            signal_success(GOING_TO_SLEEP)
+            machine.deepsleep(20 * 60 * 60 * 1000)
+
+
 def main():
     global has_mail_been_delivered, reset_sensor_active, tilt_sensor_active, bottom_sensor_active, lid_open, previous_has_mail_been_delivered
+    print("Starting main")
     set_all_output_pins(to_low=True)
     cycle_lights()
 
+    if not has_lid_sensor() or has_bottom_sensor() or has_tilt_sensor():
+        print("You need at least one sensor connected in order to run this program")
+        signal_error(ERROR_CODE_NO_SENSORS_CONNECTED)
+        machine.idle()
     try:
         print("Trying to connect to WLAN")
         connect()
@@ -249,69 +368,73 @@ def main():
         machine.reset()
 
     counter = 0
-    past_50_samples = []
+    past_samples = []
     while True:
-        time.sleep(0.5)
-        if sensor_lid.value():
-            print("Lid is open")
-            lid_open = True
-            led_yellow.high()
-        elif not sensor_lid.value():
-            print("Lid is closed")
-            lid_open = False
-            led_yellow.low()
-        if not sensor_bottom.value():
-            print("sensor_bottom is active")
-            bottom_sensor_active = True
-            led_red.high()
-        elif sensor_bottom.value():
-            print("sensor_bottom is inactive")
-            bottom_sensor_active = False
-            led_red.low()
-        if sensor_tilt_2.value():
-            print("sensor_tilt_2 is active")
-            tilt_sensor_active = True
-            led_green.high()
-        elif not sensor_tilt_2.value():
-            print("sensor_tilt_2 is inactive")
-            tilt_sensor_active = False
-            led_green.low()
-        if not sensor_reset.value():
-            print("sensor_reset is active")
-            reset_sensor_active = True
-            if has_mail_been_delivered:
-                print("#" * 50)
-                print("Resetting mail delivery status")
-                print("#" * 50)
-                has_mail_been_delivered = False
-                past_50_samples = []
-        elif sensor_reset.value():
-            print("sensor_reset is inactive")
-            reset_sensor_active = False
-        past_50_samples.append({'counter': counter,
-                                'lid_open': lid_open,
-                                'bottom_sensor_active': bottom_sensor_active,
-                                'tilt_sensor_active': tilt_sensor_active,
-                                'reset_sensor_active': reset_sensor_active})
-        if len(past_50_samples) > 50:
-            past_50_samples.pop(0)
+        time.sleep(sampling_interval)
+        if has_lid_sensor():
+            if sensor_lid.value():
+                print("Lid is open")
+                lid_open = True
+                led_yellow.high()
+            elif not sensor_lid.value():
+                print("Lid is closed")
+                lid_open = False
+                led_yellow.low()
+        if has_bottom_sensor():
+            if not sensor_bottom.value():
+                print("sensor_bottom is active")
+                bottom_sensor_active = True
+                led_red.high()
+            elif sensor_bottom.value():
+                print("sensor_bottom is inactive")
+                bottom_sensor_active = False
+                led_red.low()
+        if has_tilt_sensor():
+            if sensor_tilt.value():
+                print("sensor_tilt is active")
+                tilt_sensor_active = True
+                led_green.high()
+            elif not sensor_tilt.value():
+                print("sensor_tilt is inactive")
+                tilt_sensor_active = False
+                led_green.low()
+        if has_reset_sensor():
+            if not sensor_reset.value():
+                print("sensor_reset is active")
+                reset_sensor_active = True
+                if has_mail_been_delivered:
+                    print("#" * 50)
+                    print("Resetting mail delivery status")
+                    print("#" * 50)
+                    has_mail_been_delivered = False
+                    past_samples = []
+            elif sensor_reset.value():
+                print("sensor_reset is inactive")
+                reset_sensor_active = False
+        past_samples.append({'counter': counter,
+                             'lid_open': lid_open,
+                             'bottom_sensor_active': bottom_sensor_active,
+                             'tilt_sensor_active': tilt_sensor_active,
+                             'reset_sensor_active': reset_sensor_active})
+        if len(past_samples) > sliding_window_size:
+            past_samples.pop(0)
         if not has_mail_been_delivered:
-            has_mail_been_delivered = check_if_mail_has_been_delivered(past_50_samples)
+            has_mail_been_delivered = check_if_mail_has_been_delivered(past_samples)
             if has_mail_been_delivered:
                 print("New mail has been delivered")
-                print("Sound the buzzer 5x once")
                 buzz_buzzer(5)
         if has_mail_been_delivered:
             print("Mail is in the mailbox")
             flash_led(led_on_board, 5)
         if has_mail_been_delivered != previous_has_mail_been_delivered:
-            # we have a state change and should update Home Assistant
+            # we have a state change and should update Home Assistant, and then we can go to sleep until interrupted OR for a set duration
             send_telemetry_to_ha(has_mail_been_delivered)
+            goto_sleep()
         previous_has_mail_been_delivered = has_mail_been_delivered
         print(f"counter: {counter}")
         print(f"sensor_lid.value(): {sensor_lid.value()}")
         print(f"sensor_bottom.value(): {sensor_bottom.value()}")
-        print(f"sensor_tilt_2.value(): {sensor_tilt_2.value()}")
+        print(f"sensor_tilt.value(): {sensor_tilt.value()}")
         print(f"sensor_reset.value(): {sensor_reset.value()}")
         counter += 1
 

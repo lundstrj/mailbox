@@ -1,3 +1,4 @@
+# Connectivity settings
 wifi_ssid: "your_wifi_ssid"
 wifi_password: "your_wifi_password"
 max_wifi_connect_attempts_before_resetting_device: 10
@@ -8,3 +9,20 @@ home_assistant_unique_id: "1234567890-smart_mailbox"
 consecutive_tilt_sensor_active_needed_to_trigger: 10
 consecutive_lid_open_needed_to_trigger: 10
 consecutive_bottom_sensor_active_needed_to_trigger: 5
+
+# defining the pins for the outputs
+led_green_pin: 13
+led_yellow_pin: 14
+led_red_pin: 15
+buzzer_pin: 16
+
+# defining the pins for the sensors
+sensor_bottom_pin: 12
+sensor_tilt_pin: 11
+sensor_lid_pin: 10
+sensor_reset_pin: 9
+wake_source_pin: 9
+
+# defining other useful constants
+sliding_window_size: 60 # (at 0.5 seconds per sample, this is a 30 seconds window)
+sampling_interval: 0.5
