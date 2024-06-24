@@ -243,13 +243,29 @@ def connect() -> network.WLAN:
     return wlan
 ```
 
+### Testing
+#### What has been done
+- Mailbox has been extensively tested in my lab as an assembled system.
+- I have tested each individual sensor standalone to ensure that they work as expected (before assembly)
+- The wifi connection, the Home Assistant connection and the ntfy.sh connection has also been tested in isolation and have simple error handling for common problems.
+- There are some basic preflight checks before the main loop starts to ensure that the system is in a good state before starting the main loop.
+- The classes imported from the Machine library have been mocked in mock.py which allows tests to be carried out on the logic separately from the hardware.  
+
+#### What has NOT been done
+There is little to no error handling for hardware malfunctions at run time (say one sensor out of 3 starts misbehaving, there is currently no logic to handle that)
+
+#### What could have (reasonably) been done
+Automated testing in a CI/CD pipeline would have been nice to have. I have not set this up as time is still not infinite and it would require having my own Github Runner in order to have a Pico hooked up to be able to test the whole system. 
+
 ## Data visualization
-Mailbox is equipped with logic to send data to a Home Assistant server, which can then be used to visualize the data in a pretty straight forward way.
+Mailbox is equipped with logic to send data to a Home Assistant server, which can then be used to visualize the data in a pretty straight forward way.<br><br>
+__TODO: ADD SCREENSHOT__
 
 ## In the end
 I have a mailbox that can tell me if mail has been delivered today or not. I can also see this information in Home Assistant and get notifications on my phone if I want to.
 Looking back I cannot help but feel like this kind of microcontroller is gross overkill for this project but we need to also factor in speed of development, which is hard to beat for a project with a low low volume of one.
 
 I can probably optimize things a fair bit by only powering on the Pico when the mailbox is opened, immediately going into mail detection mode and trying to connect to the wifi and send the message (mail or no mail) and then shutting down again. That would mean that I'd have a sort of hardware power switch in the lid which can turn the Pico on but not off when the lid closes again.
+Since the Pico is a dual core microcontroller, I could also have one core running the main loop and the other core handling the wifi connection and message sending. This would allow me to have purer logic (as the current implementation can in practice miss mail delivery samples if it is in the middle of flashing ligths or buzzing a buzzer since only one thread is used and execution is strictly sequential)
 
 Overall, I am pleased with my setup and choice of tools. Home Assistant performed well and was a dream to setup. Ntfy.sh was also a breeze to setup and use. The Pico can be a bit flaky in terms of connecting to wifi but wasn't difficult to work around with a few lines of code.
