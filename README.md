@@ -1,7 +1,7 @@
 # Mailbox
 _Johan Lundström - jl226ki_
 
-A simple setup for knowing if someone (maybe a even a mailman) has been fiddling with your mailbox today.
+A simple setup for knowing if someone (maybe even a mailman) has been fiddling with your mailbox today.
 
 ## Overview
 ### The problem
