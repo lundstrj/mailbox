@@ -1,11 +1,10 @@
 import time
-from machine import Pin
+import ntptime
+from machine import Pin, reset, lightsleep, idle
+# from mock import Pin
 import network
 import urequests
 import ujson
-from time import sleep
-import machine
-import yaml
 
 # Define error codes
 ERROR_CODE_WIFI_NOT_CONNECTED = 2
@@ -15,8 +14,8 @@ ERROR_CODE_WIFI_NOT_CONFIGURED = 8
 ERROR_CODE_NO_SENSORS_CONNECTED = 12
 GOING_TO_SLEEP = 10
 
-
 # Potentially useful globals
+NOT_SET = -1
 has_mail_been_delivered: bool = False
 previous_has_mail_been_delivered: bool = False
 lid_open: bool = False
@@ -26,8 +25,29 @@ reset_sensor_active: bool = False
 
 
 def load_settings(file_name: str) -> dict:
-    with open(file_name) as file:
-        _settings = yaml.safe_load(file)
+    # with our own homegrown quite limited yaml parser
+    # it does handle comments though, sort of
+    with open(file_name, 'r') as file:
+        _settings = {}
+        lines = file.readlines()
+        for line in lines:
+            if line[0] == '#':
+                pass
+            elif len(line) == 0:
+                pass
+            else:
+                parts = line.split(':')
+                if len(parts) == 2:
+                    key = parts[0].strip()
+                    value = parts[1].strip()
+                    _settings[key] = value
+                elif len(parts) > 2:
+                    key = parts[0].strip()
+                    value = ":".join(parts[1:]).strip()
+                    if "#" in value:
+                        value = value.split("#")[0]
+                    _settings[key] = value
+                print(f"key: {key}, value: {value}")
         return _settings
 
 
@@ -39,84 +59,95 @@ ssid: str = settings.get('wifi_ssid', 'ssid_not_set')
 password: str = settings.get('wifi_password', 'wifi_password_not_set')
 home_assistant_url: str = settings.get('home_assistant_url', 'http://homeassistant.local:8123/')
 home_assistant_token: str = settings.get('home_assistant_bearer_token', 'not_set')
+home_assistant_is_configured = True
+if home_assistant_token == 'not_set' or home_assistant_token == 'your_home_assistant_bearer_token' or len(
+        home_assistant_token) < 40:
+    print(f"Please set your Home Assistant Bearer Token in {settings_file_name}")
+    print(f"Will run mailbox without Home Assistant integration")
+    home_assistant_is_configured = False
 home_assistant_unique_id: str = settings.get('home_assistant_unique_id', 'net_set')
 home_assistant_entity_id: str = settings.get('home_assistant_entity_id', 'not_set')
-consecutive_tilt_sensor_active_needed_to_trigger: int = settings.get('consecutive_tilt_sensor_active_needed_to_trigger',
-                                                                     10)
-consecutive_lid_open_needed_to_trigger: int = settings.get('consecutive_lid_open_needed_to_trigger', 10)
-consecutive_bottom_sensor_active_needed_to_trigger: int = settings.get(
-    'consecutive_bottom_sensor_active_needed_to_trigger', 10)
-max_wifi_connect_attempts_before_resetting_device: int = settings.get(
-    'max_wifi_connect_attempts_before_resetting_device', 10)
-sliding_window_size: int = settings.get('sliding_window_size', 300)
-sampling_interval: float = settings.get('sampling_interval', 0.5)
+consecutive_tilt_sensor_active_needed_to_trigger: int = int(
+    settings.get('consecutive_tilt_sensor_active_needed_to_trigger', 10))
+consecutive_lid_open_needed_to_trigger: int = int(settings.get('consecutive_lid_open_needed_to_trigger', 10))
+consecutive_bottom_sensor_active_needed_to_trigger: int = int(settings.get(
+    'consecutive_bottom_sensor_active_needed_to_trigger', 10))
+max_wifi_connect_attempts_before_resetting_device: int = int(
+    settings.get('max_wifi_connect_attempts_before_resetting_device', 10))
+sliding_window_size: int = int(settings.get('sliding_window_size', 60))
+sampling_interval: float = float(settings.get('sampling_interval', 0.5))
 
-led_green_pin = settings.get('led_green_pin', 'not_set')
-led_yellow_pin = settings.get('led_yellow_pin', 'not_set')
-led_red_pin = settings.get('led_red_pin', 'not_set')
-buzzer_pin = settings.get('buzzer_pin', 'not_set')
+led_green_pin: int = int(settings.get('led_green_pin', NOT_SET))
+led_yellow_pin: int = int(settings.get('led_yellow_pin', NOT_SET))
+led_red_pin: int = int(settings.get('led_red_pin', NOT_SET))
+buzzer_pin: int = int(settings.get('buzzer_pin', NOT_SET))
 
 # Define the pins for output
 led_on_board: Pin = Pin("LED", Pin.OUT)
 output_pins = [led_on_board]
-if led_green_pin != 'not_set':
+if led_green_pin != NOT_SET:
     print(f"led_green_pin: {led_green_pin}")
     led_green: Pin = Pin(led_green_pin, Pin.OUT)
     output_pins.append(led_green)
 else:
     print(f"No led_green_pin set in {settings_file_name}")
-if led_yellow_pin != 'not_set':
+if led_yellow_pin != NOT_SET:
     print(f"led_yellow_pin: {led_yellow_pin}")
-    led_yellow: Pin = Pin(14, Pin.OUT)
+    led_yellow: Pin = Pin(led_yellow_pin, Pin.OUT)
     output_pins.append(led_yellow)
 else:
     print(f"No led_yellow_pin set in {settings_file_name}")
-if led_red_pin != 'not_set':
+if led_red_pin != NOT_SET:
     print(f"led_red_pin: {led_red_pin}")
-    led_red: Pin = Pin(15, Pin.OUT)
+    led_red: Pin = Pin(led_red_pin, Pin.OUT)
     output_pins.append(led_red)
 else:
     print(f"No led_red_pin set in {settings_file_name}")
-if buzzer_pin != 'not_set':
+if buzzer_pin != NOT_SET:
     print(f"buzzer_pin: {buzzer_pin}")
-    buzzer: Pin = Pin(16, Pin.OUT)
+    buzzer: Pin = Pin(buzzer_pin, Pin.OUT)
 else:
     print(f"No buzzer_pin set in {settings_file_name}")
 
-sensor_bottom_pin = settings.get('sensor_bottom_pin', 'not_set')
-sensor_tilt_pin = settings.get('sensor_tilt_pin', 'not_set')
-sensor_lid_pin = settings.get('sensor_lid_pin', 'not_set')
-sensor_reset_pin = settings.get('sensor_reset_pin', 'not_set')
-wake_source_pin = settings.get('wake_source_pin', 'not_set')
+sensor_bottom_pin: int = int(settings.get('sensor_bottom_pin', NOT_SET))
+sensor_tilt_pin: int = int(settings.get('sensor_tilt_pin', NOT_SET))
+sensor_lid_pin: int = int(settings.get('sensor_lid_pin', NOT_SET))
+sensor_reset_pin: int = int(settings.get('sensor_reset_pin', NOT_SET))
+wake_source_pin: int = int(settings.get('wake_source_pin', NOT_SET))
+proximity_sensor_pin: int = int(settings.get('proximity_sensor_pin', NOT_SET))
 
 # Define the pins for input
-if sensor_bottom_pin != 'not_set':
+if sensor_bottom_pin != NOT_SET:
     print(f"sensor_bottom_pin: {sensor_bottom_pin}")
     sensor_bottom: Pin = Pin(sensor_bottom_pin, Pin.IN, pull=Pin.PULL_UP)
 else:
     print(f"No sensor_bottom_pin set in {settings_file_name}")
-if sensor_tilt_pin != 'not_set':
+if sensor_tilt_pin != NOT_SET:
     print(f"sensor_tilt_pin: {sensor_tilt_pin}")
     sensor_tilt: Pin = Pin(sensor_tilt_pin, Pin.IN, pull=Pin.PULL_UP)
 else:
     print(f"No sensor_tilt_pin set in {settings_file_name}")
-if sensor_lid_pin != 'not_set':
+if sensor_lid_pin != NOT_SET:
     print(f"sensor_lid_pin: {sensor_lid_pin}")
     sensor_lid: Pin = Pin(sensor_lid_pin, Pin.IN, pull=Pin.PULL_UP)
 else:
     print(f"No sensor_lid_pin set in {settings_file_name}")
-if sensor_reset_pin != 'not_set':
+if sensor_reset_pin != NOT_SET:
     print(f"sensor_reset_pin: {sensor_reset_pin}")
     sensor_reset: Pin = Pin(sensor_reset_pin, Pin.IN, pull=Pin.PULL_UP)
 else:
     print(f"No sensor_reset_pin set in {settings_file_name}")
-if wake_source_pin != 'not_set':
+if wake_source_pin != NOT_SET:
     print(f"wake_source_pin: {wake_source_pin}")
     wake_source: Pin = Pin(wake_source_pin, Pin.IN, pull=Pin.PULL_UP)
-    wake_source.irq(trigger=Pin.IRQ_FALLING, handler=None, wake=(machine.DEEPSLEEP or machine.SLEEP or machine.IDLE))
+    wake_source.irq(handler=None, trigger=Pin.IRQ_RISING)
 else:
     print(f"No wake_source_pin set in {settings_file_name}")
-
+if proximity_sensor_pin != NOT_SET:
+    print(f"proximity_sensor_pin: {proximity_sensor_pin}")
+    proximity_sensor: Pin = Pin(proximity_sensor_pin, Pin.IN, pull=Pin.PULL_UP)
+else:
+    print(f"No proximity_sensor_pin set in {settings_file_name}")
 
 """
 assert ssid != 'your_ssid', f"Please set your WiFi SSID in {settings_file_name}" # noqa
@@ -167,6 +198,14 @@ def has_wake_source() -> bool:
         return False
 
 
+def has_buzzer() -> bool:
+    try:
+        buzzer.value()
+        return True
+    except AttributeError:
+        return False
+
+
 def set_all_output_pins(to_low: bool = True, to_high: bool = False) -> None:
     for pin in output_pins:
         if to_low:
@@ -189,12 +228,15 @@ def slow_flash_led(led: Pin, flashes: int = 5, flash_duration: float = 1) -> Non
 
 
 def buzz_buzzer(buzzes: int = 5, buzz_duration: float = 0.1) -> None:
-    print(f'buzzing the buzzer: {buzzes} times for {buzz_duration} seconds each')
-    for i in range(buzzes):
-        buzzer.high()
-        time.sleep(buzz_duration)
-        buzzer.low()
-    print('buzzing the buzzer: done')
+    if has_buzzer():
+        print(f'buzzing the buzzer: {buzzes} times for {buzz_duration} seconds each')
+        for i in range(buzzes):
+            buzzer.high()
+            time.sleep(buzz_duration)
+            buzzer.low()
+        print('buzzing the buzzer: done')
+    else:
+        print("No buzzer connected")
 
 
 def cycle_lights(cycles: int = 5) -> None:
@@ -202,12 +244,12 @@ def cycle_lights(cycles: int = 5) -> None:
         print(f'toggling lights: {i}/{cycles}')
         for led in output_pins:
             led.toggle()
-            sleep(0.1)
+            time.sleep(0.1)
         leds = output_pins.copy()
         leds.reverse()
         for led in leds:
             led.toggle()
-            sleep(0.1)
+            time.sleep(0.1)
     print('toggling lights: done')
 
 
@@ -240,8 +282,8 @@ def connect() -> network.WLAN:
     wlan.connect(ssid, password)
     attempts = 0
     while not wlan.isconnected():
-        print('Waiting for connection...')
-        sleep(1)
+        print(f'Waiting for connection ({attempts}/{max_wifi_connect_attempts_before_resetting_device})...')
+        time.sleep(1)
         led_on_board.toggle()  # noqa
         attempts += 1
         if attempts > max_wifi_connect_attempts_before_resetting_device:
@@ -249,7 +291,7 @@ def connect() -> network.WLAN:
                 f"Could not connect to WiFi (after {attempts} attempts), please check your {settings_file_name} file and wifi status")
             signal_error(ERROR_CODE_WIFI_NOT_CONNECTED)
             print("Resetting the device")
-            machine.reset()
+            reset()
     print(wlan.ifconfig())
     signal_success(2)
     led_on_board.high()
@@ -258,11 +300,10 @@ def connect() -> network.WLAN:
 
 
 def send_telemetry_to_ha(mail_has_been_delivered: bool) -> None:
-    if home_assistant_token == 'not_set':
+    if not home_assistant_is_configured:
         print(f"Home Assistant Bearer Token is not set, please set it in {settings_file_name}")
         signal_error(ERROR_CODE_HOME_ASSISTANT_NOT_CONNECTED)
         return None
-    print(f"Sending telemetry to Home Assistant: ")
     state = 0
     if mail_has_been_delivered:
         state = 1
@@ -330,18 +371,26 @@ def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
 
 def goto_sleep(duration: int = 0) -> None:
     if duration > 0:
-        print(f"Going to sleep for {duration} seconds")
+        print(f"Going to sleep for {duration} seconds ({duration / 60 / 60} hours or {duration * 1000} milliseconds)")
         signal_success(GOING_TO_SLEEP)
-        machine.deepsleep(duration * 1000)
+        half_hour_sleeps = int(duration / (30*60))  # 30 minutes
+        print(f"That will be {half_hour_sleeps} half hour sleeps")
+        for i in range(half_hour_sleeps):
+            print(f"Sleeping for 30 minutes ({i}/{half_hour_sleeps})")
+            lightsleep(30 * 60 * 1000)
+            print(f"Waking up from sleep {i}")
     else:
         if has_wake_source():
             print("Going to deep sleep forever (until interrupted)")
             signal_success(GOING_TO_SLEEP)
-            machine.deepsleep()
+            lightsleep()
         else:
             print("Going to sleep for 20 hours (since there is no wake source)")
             signal_success(GOING_TO_SLEEP)
-            machine.deepsleep(20 * 60 * 60 * 1000)
+            lightsleep(20 * 60 * 60 * 1000)
+    print("Waking up from sleep")
+    time.sleep(1)
+    wake_source.low()
 
 
 def main():
@@ -350,10 +399,10 @@ def main():
     set_all_output_pins(to_low=True)
     cycle_lights()
 
-    if not has_lid_sensor() or has_bottom_sensor() or has_tilt_sensor():
+    if not has_lid_sensor() and not has_bottom_sensor() and not has_tilt_sensor():
         print("You need at least one sensor connected in order to run this program")
         signal_error(ERROR_CODE_NO_SENSORS_CONNECTED)
-        machine.idle()
+        idle()
     try:
         print("Trying to connect to WLAN")
         connect()
@@ -361,15 +410,49 @@ def main():
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
         signal_error(ERROR_CODE_KEYBOARD_INTERRUPT)
-        machine.reset()
+        reset()
     except ValueError as e:
         print(f"ValueError: {e}")
         led_on_board.high()
-        machine.reset()
+        reset()
+
+    try:
+        print("Trying to set the time")
+        ntptime.ntptime.settime()
+        print(f"Time set to: {time.localtime()}")
+    except OSError:
+        print("Could not set the time")
 
     counter = 0
     past_samples = []
+    attempts = 0
+    max_attempts = 10
     while True:
+        if attempts > max_attempts:
+            print(f"Could not send telemetry to Home Assistant after {max_attempts} attempts")
+            signal_error(ERROR_CODE_HOME_ASSISTANT_NOT_CONNECTED)
+            raise Exception(f"Could not send telemetry to Home Assistant despite {attempts} attempts")
+        try:
+            send_telemetry_to_ha(False)  # resetting the state in Home Assistant
+            break
+        except OSError:
+            attempts += 1
+            time.sleep(1)
+
+    while True:
+        # check the local time and if it is between 10pm and 6am, go to sleep until 6am
+        current_time = time.localtime()
+        if current_time[3] >= 18 or current_time[3] < 6:
+            print("It is between 18:00 and 06:00, going to sleep until 06:00")
+            # calculate the time until 6am
+            hours_until_6am = 6 - current_time[3]
+            minutes_until_6am = 60 - current_time[4]
+            seconds_until_6am = 60 - current_time[5]
+            seconds_until_6am += minutes_until_6am * 60
+            seconds_until_6am += hours_until_6am * 60 * 60
+            goto_sleep(seconds_until_6am)
+        else:
+            print("It is not between 18:00 and 06:00, continuing with the program")
         time.sleep(sampling_interval)
         if has_lid_sensor():
             if sensor_lid.value():
@@ -428,8 +511,9 @@ def main():
             flash_led(led_on_board, 5)
         if has_mail_been_delivered != previous_has_mail_been_delivered:
             # we have a state change and should update Home Assistant, and then we can go to sleep until interrupted OR for a set duration
+            set_all_output_pins(to_low=True)
             send_telemetry_to_ha(has_mail_been_delivered)
-            goto_sleep()
+            goto_sleep(duration=20 * 60 * 60)
         previous_has_mail_been_delivered = has_mail_been_delivered
         print(f"counter: {counter}")
         print(f"sensor_lid.value(): {sensor_lid.value()}")
