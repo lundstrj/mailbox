@@ -371,8 +371,7 @@ def send_telemetry_to_ntfy(mail_has_been_delivered: bool = False, optional_messa
 
 def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
     """
-        {'counter': counter,
-        'lid_open': lid_open,
+        {'lid_open': lid_open,
         'bottom_sensor_active': bottom_sensor_active,
         'tilt_sensor_active': tilt_sensor_active}
     """
@@ -473,7 +472,6 @@ def main():
         led_on_board.high()
         reset()
 
-    counter = 0
     past_samples = []
     attempts = 0
     max_attempts = 10
@@ -559,8 +557,7 @@ def main():
                 led_red.low()
                 debug_print("sensor_reset is inactive", level=DEBUG)
                 reset_sensor_active = False
-        past_samples.append({'counter': counter,
-                             'lid_open': lid_open,
+        past_samples.append({'lid_open': lid_open,
                              'bottom_sensor_active': bottom_sensor_active,
                              'tilt_sensor_active': tilt_sensor_active,
                              'reset_sensor_active': reset_sensor_active})
@@ -600,7 +597,6 @@ def main():
                         debug_print("Reset sensor is not active, will go to sleep again")
 
         previous_has_mail_been_delivered = has_mail_been_delivered
-        debug_print(f"counter: {counter}", level=ALWAYS_PRINT)
         if len(past_samples) > 1:
             print_status = False
             if past_samples[-1].get('lid_open', False) != past_samples[-2].get('lid_open', False):
@@ -616,9 +612,6 @@ def main():
                 debug_print(f"sensor_bottom.value(): {sensor_bottom.value()}", level=ALWAYS_PRINT)
                 debug_print(f"sensor_tilt.value(): {sensor_tilt.value()}", level=ALWAYS_PRINT)
                 debug_print(f"sensor_reset.value(): {sensor_reset.value()}", level=ALWAYS_PRINT)
-        if counter == 2147483647: # max int 31 bit + sign bit
-            counter = 0
-        counter += 1
 
 
 main()
