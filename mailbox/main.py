@@ -1,5 +1,4 @@
 import time
-import ntptime
 from machine import Pin, reset, lightsleep, idle
 # from mock import Pin
 import network
@@ -22,6 +21,7 @@ lid_open: bool = False
 bottom_sensor_active: bool = False
 tilt_sensor_active: bool = False
 reset_sensor_active: bool = False
+wlan: network.WLAN
 
 
 def load_settings(file_name: str) -> dict:
@@ -57,6 +57,12 @@ settings: dict = load_settings(settings_file_name)
 # set the SSID and password of your WiFi along with other useful settings
 ssid: str = settings.get('wifi_ssid', 'ssid_not_set')
 password: str = settings.get('wifi_password', 'wifi_password_not_set')
+ntfy_topic: str = settings.get('ntfy_topic', 'not_set')
+if ntfy_topic == 'not_set':
+    print(f"Please set your NTFY topic in {settings_file_name}")
+    print(f"Will run mailbox without NTFY integration")
+else:
+    print(f"ntfy_topic: {ntfy_topic}")
 home_assistant_url: str = settings.get('home_assistant_url', 'http://homeassistant.local:8123/')
 home_assistant_token: str = settings.get('home_assistant_bearer_token', 'not_set')
 home_assistant_is_configured = True
@@ -277,11 +283,11 @@ def connect() -> network.WLAN:
         signal_error(ERROR_CODE_WIFI_NOT_CONFIGURED)
         raise ValueError(f"Please set your WiFi SSID and password in {settings_file_name}")
     # Connect to WLAN
-    wlan = network.WLAN(network.STA_IF)  # noqa
-    wlan.active(True)
-    wlan.connect(ssid, password)
+    wlan_ = network.WLAN(network.STA_IF)  # noqa
+    wlan_.active(True)
+    wlan_.connect(ssid, password)
     attempts = 0
-    while not wlan.isconnected():
+    while not wlan_.isconnected():
         print(f'Waiting for connection ({attempts}/{max_wifi_connect_attempts_before_resetting_device})...')
         time.sleep(1)
         led_on_board.toggle()  # noqa
@@ -292,11 +298,11 @@ def connect() -> network.WLAN:
             signal_error(ERROR_CODE_WIFI_NOT_CONNECTED)
             print("Resetting the device")
             reset()
-    print(wlan.ifconfig())
+    print(wlan_.ifconfig())
     signal_success(2)
     led_on_board.high()
     print(f"Connected to WiFi: {ssid}")
-    return wlan
+    return wlan_
 
 
 def send_telemetry_to_ha(mail_has_been_delivered: bool) -> None:
@@ -311,10 +317,10 @@ def send_telemetry_to_ha(mail_has_been_delivered: bool) -> None:
     data = {
         "state": state,
         "attributes": {
-            "device_class": "presence",
+            "device_class": "enum",
             "friendly_name": "Smart Mailbox",
             "unit_of_measurement": "Mail in box",
-            "state_class": "measurement",
+            "state_class": None,
             "unique_id": home_assistant_unique_id
         }
     }
@@ -330,6 +336,28 @@ def send_telemetry_to_ha(mail_has_been_delivered: bool) -> None:
     print(response.text)
 
 
+def send_telemetry_to_ntfy(mail_has_been_delivered: bool = False, optional_message: str = None) -> urequests.Response:
+    print(f"Sending telemetry to NTFY")
+    if ntfy_topic == 'not_set':
+        print(f"Please set your NTFY topic in {settings_file_name}")
+        return
+    else:
+        print(f"Sending telemetry to NTFY: {ntfy_topic} - Mail has been delivered: {mail_has_been_delivered}")
+    url_str = f"https://ntfy.sh/{ntfy_topic}"
+    if optional_message is not None:
+        print(f"Sending telemetry to NTFY: {optional_message}")
+        response = urequests.post(url_str, data=optional_message)
+    else:
+        if mail_has_been_delivered:
+            print(f"Sending telemetry to NTFY: Mail has been delivered")
+            response = urequests.post(url_str, data=b"Mail has been delivered")
+        else:
+            print(f"Sending telemetry to NTFY: Mail has not been delivered")
+            response = urequests.post(url_str, data=b"Mail has not been delivered")
+    print(f"Response from NTFY: {response.status_code}")
+    return response
+
+
 def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
     """
         {'counter': counter,
@@ -342,6 +370,9 @@ def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
     consecutive_lid_open = 0
     consecutive_bottom_sensor_active = 0
     previous_sample = None
+    if len(list_of_samples) < 10:
+        print(f"Too few samples to determine if mail has been delivered")
+        return False
     for sample in list_of_samples:
         if previous_sample is None:
             previous_sample = sample
@@ -355,7 +386,7 @@ def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
                 consecutive_lid_open += 1
             elif not sample.get('lid_open', False):
                 consecutive_lid_open = 0
-            if sample.get('bottom_sensor_active', False) and previous_sample('bottom_sensor_active', False):
+            if sample.get('bottom_sensor_active', False) and previous_sample.get('bottom_sensor_active', False):
                 consecutive_bottom_sensor_active += 1
             elif not sample.get('bottom_sensor_active', False):
                 consecutive_bottom_sensor_active = 0
@@ -370,14 +401,22 @@ def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
 
 
 def goto_sleep(duration: int = 0) -> None:
+    global wlan
     if duration > 0:
         print(f"Going to sleep for {duration} seconds ({duration / 60 / 60} hours or {duration * 1000} milliseconds)")
         signal_success(GOING_TO_SLEEP)
         half_hour_sleeps = int(duration / (30*60))  # 30 minutes
         print(f"That will be {half_hour_sleeps} half hour sleeps")
+        print("But first wifi needs to be disconnected")
+        wlan.disconnect()
+        print("Wifi disconnected")
+
+        print(f"Entering first sleep out of {half_hour_sleeps}...")
         for i in range(half_hour_sleeps):
             print(f"Sleeping for 30 minutes ({i}/{half_hour_sleeps})")
-            lightsleep(30 * 60 * 1000)
+            milliseconds = 30 * 60 * 1000
+            print(f"Going to sleep for 30 minutes: {milliseconds} milliseconds")
+            lightsleep(milliseconds)
             print(f"Waking up from sleep {i}")
     else:
         if has_wake_source():
@@ -394,7 +433,7 @@ def goto_sleep(duration: int = 0) -> None:
 
 
 def main():
-    global has_mail_been_delivered, reset_sensor_active, tilt_sensor_active, bottom_sensor_active, lid_open, previous_has_mail_been_delivered
+    global wlan, has_mail_been_delivered, reset_sensor_active, tilt_sensor_active, bottom_sensor_active, lid_open, previous_has_mail_been_delivered
     print("Starting main")
     set_all_output_pins(to_low=True)
     cycle_lights()
@@ -405,7 +444,7 @@ def main():
         idle()
     try:
         print("Trying to connect to WLAN")
-        connect()
+        wlan = connect()
         print("Connected to WLAN")
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
@@ -415,13 +454,6 @@ def main():
         print(f"ValueError: {e}")
         led_on_board.high()
         reset()
-
-    try:
-        print("Trying to set the time")
-        ntptime.ntptime.settime()
-        print(f"Time set to: {time.localtime()}")
-    except OSError:
-        print("Could not set the time")
 
     counter = 0
     past_samples = []
@@ -441,6 +473,7 @@ def main():
 
     while True:
         # check the local time and if it is between 10pm and 6am, go to sleep until 6am
+        """
         current_time = time.localtime()
         if current_time[3] >= 18 or current_time[3] < 6:
             print("It is between 18:00 and 06:00, going to sleep until 06:00")
@@ -453,12 +486,16 @@ def main():
             goto_sleep(seconds_until_6am)
         else:
             print("It is not between 18:00 and 06:00, continuing with the program")
+        """
+        led_on_board.high()
         time.sleep(sampling_interval)
+        led_on_board.low()
         if has_lid_sensor():
             if sensor_lid.value():
                 print("Lid is open")
                 lid_open = True
                 led_yellow.high()
+                time.sleep(0.1)
             elif not sensor_lid.value():
                 print("Lid is closed")
                 lid_open = False
@@ -468,6 +505,7 @@ def main():
                 print("sensor_bottom is active")
                 bottom_sensor_active = True
                 led_red.high()
+                time.sleep(0.1)
             elif sensor_bottom.value():
                 print("sensor_bottom is inactive")
                 bottom_sensor_active = False
@@ -477,6 +515,7 @@ def main():
                 print("sensor_tilt is active")
                 tilt_sensor_active = True
                 led_green.high()
+                time.sleep(0.1)
             elif not sensor_tilt.value():
                 print("sensor_tilt is inactive")
                 tilt_sensor_active = False
@@ -485,6 +524,9 @@ def main():
             if not sensor_reset.value():
                 print("sensor_reset is active")
                 reset_sensor_active = True
+                led_green.high()
+                led_yellow.high()
+                led_red.high()
                 if has_mail_been_delivered:
                     print("#" * 50)
                     print("Resetting mail delivery status")
@@ -492,6 +534,9 @@ def main():
                     has_mail_been_delivered = False
                     past_samples = []
             elif sensor_reset.value():
+                led_green.low()
+                led_yellow.low()
+                led_red.low()
                 print("sensor_reset is inactive")
                 reset_sensor_active = False
         past_samples.append({'counter': counter,
@@ -512,14 +557,41 @@ def main():
         if has_mail_been_delivered != previous_has_mail_been_delivered:
             # we have a state change and should update Home Assistant, and then we can go to sleep until interrupted OR for a set duration
             set_all_output_pins(to_low=True)
+            send_telemetry_to_ntfy(has_mail_been_delivered)
             send_telemetry_to_ha(has_mail_been_delivered)
-            goto_sleep(duration=20 * 60 * 60)
+            # goto_sleep(duration=20 * 60 * 60)
+            while True:
+                print("Going to sleep for 10 seconds")
+                time.sleep(10)
+                print("Waking up from sleep")
+                print("Checking if the reset sensor is active")
+                if has_reset_sensor():
+                    if not sensor_reset.value():
+                        print("sensor_reset is active")
+                        has_mail_been_delivered = False
+                        past_samples = []
+                        send_telemetry_to_ntfy(optional_message="Mailbox has been reset")
+                        break
+                    else:
+                        print("Reset sensor is not active, will go to sleep again")
+
         previous_has_mail_been_delivered = has_mail_been_delivered
         print(f"counter: {counter}")
-        print(f"sensor_lid.value(): {sensor_lid.value()}")
-        print(f"sensor_bottom.value(): {sensor_bottom.value()}")
-        print(f"sensor_tilt.value(): {sensor_tilt.value()}")
-        print(f"sensor_reset.value(): {sensor_reset.value()}")
+        if len(past_samples) > 1:
+            print_status = False
+            if past_samples[-1].get('lid_open', False) != past_samples[-2].get('lid_open', False):
+                print_status = True
+            elif past_samples[-1].get('bottom_sensor_active', False) != past_samples[-2].get('bottom_sensor_active', False):
+                print_status = True
+            elif past_samples[-1].get('tilt_sensor_active', False) != past_samples[-2].get('tilt_sensor_active', False):
+                print_status = True
+            elif past_samples[-1].get('reset_sensor_active', False) != past_samples[-2].get('reset_sensor_active', False):
+                print_status = True
+            if print_status:
+                print(f"sensor_lid.value(): {sensor_lid.value()}")
+                print(f"sensor_bottom.value(): {sensor_bottom.value()}")
+                print(f"sensor_tilt.value(): {sensor_tilt.value()}")
+                print(f"sensor_reset.value(): {sensor_reset.value()}")
         counter += 1
 
 
