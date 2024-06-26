@@ -1,11 +1,11 @@
 # Mailbox
 _Johan Lundström - jl226ki_
 
-A simple setup for knowing if someone (maybe even a mailman) has been fiddling with your mailbox today.
+A simple (perhaps even crude) Raspberry Pi Pico setup (in MicroPython) for sort of knowing if someone (maybe even a mailman) or something :alien: has been fiddling with your mailbox today.
 
 ## Overview
 ### The problem
-My current residence get intermittent mail delivery (supposedly every other day for mail, but packages can come any day). Some days you don't get anything even if it is a mail delivery day. The mail also gets deliverd at different times depending on reasons (I suppose), so what does one do? Well you go check your mailbox at least 5+ times per day just to be sure.
+My current residence get intermittent mail delivery (supposedly every other day for mail, but packages can come any day). Some days you don't get anything even if it is a mail delivery day. The mail also gets delivered at different times depending on reasons (I suppose), so what does one do? Well you go check your mailbox at least 5+ times per day just to be sure.
 
 If only there was a better way.
 
@@ -15,7 +15,8 @@ There is a better way!
 Get a microcontroller and some sensors and hook them up to your mailbox. This way you can know if the mailman has been by today or not. You can even get fancy and hook it up to your home automation system to get notifications when mail has been delivered.
 
 ### Time to complete
-If you have my code, all the hardware and a mailbox, you can probably get this done in an hour or two.
+__2 hours__<br>
+If you have my code, all the hardware and a mailbox and know how to flash code onto a Pico (or possess the ability to follow one of the many many online tutorials and guides) you can probably get this done in an hour or two.
 
 _(it took me significantly longer, but I was also prototyping and testing a lot of things along the way)_
 
@@ -24,11 +25,11 @@ __TODO: video of operation__
 
 ## Objective
 ### Why?
-I'd like to know if mail has been delivered today or not without having to check the mailbox multiple times per day.
+I'd like to know if mail has been delivered today or not without having to check the mailbox (walk out and lift the lid).
 ### Purpose
-To have a smart mailbox that can tell me if mail has been delivered today or not.
+To notify me (in Home Assistant Dashboard and by a push notification to my phone) if and when mail has (probably) been delivered to my mailbox.
 ### Insights
-To know if mail has been delivered today or not, you need to know if the mailbox has been opened today or not. This can be achieved by having a sensor that can detect if the mailbox has been opened or not. You can also have a sensor that can detect if the mailbox has been tilted or not. By combining these two sensors you can have a pretty good idea if mail has been delivered today or not.
+The main insight is the binary state of mail present in my mailbox, or not. With the events sent to Home Assistant I would also be able to plot delivery times, see if any specific days seem to be more likely to have mail delivered. I'll be able to see if mail delivery patterns change over time (say if the mailman changes route or if the mailman changes. Perhaps there are seasonal changes?). 
 
 ## Bill of materials
 Basically you need a microcontroller and a couple of buttons. I used a Raspberry Pi Pico W and some push buttons and a tilt sensor (mainly to be fancy). You can get away with only one push button if you'd like, but I will be using the following:
@@ -39,35 +40,38 @@ Basically you need a microcontroller and a couple of buttons. I used a Raspberry
 - [ ] tape is always good to have around
 
 TODO: ADD PICTURES
+TODO: ADD PRICES
+TODO: ADD LINKS
+TODO: MAKE TABLE INSTEAD OF LIST
 
 <details>
 <summary>Other useful things</summary>
-- <kbd> Breadboard<br>
-- <kbd> 3x LEDs<br>
-- <kbd> approximately 500 jumper wires<br>
-- <kbd> A nice fancy mailbox to keep in your lab so you can test things inside without needing to take your production mailbox down =)<br>
+- <kbd> Breadboard </kbd>
+- <kbd> 3x LEDs </kbd>
+- <kbd> approximately 500 jumper wires </kbd>
+- <kbd> A nice fancy mailbox to keep in your lab so you can test things inside without needing to take your production mailbox down =) </kbd>
 </details>
 
 ## Assembly instructions
-I used a Pico WH on a breadboard to prototype this. I also added LEDs and a buzzer to help me see the state without hooking up a debugger. You can do that too if you want to, or just skip all of that and wire up the barebones setup in that section :point_down:
+I used a Pico WH on a breadboard to prototype this. I also added LEDs and a buzzer to help me see the state without hooking up a debugger. You can do that too if you want to, or just skip all of that and wire up the bare bones setup in that section :point_down:
 
 ### Computer setup
 I am not going to go very deep into this, it is instead left mostly as an exercise for the reader. Many guides exist on how to set up a Raspberry Pi Pico, and I am sure you can find one that suits your needs.
-You will need some sort of computer to write the code on. You will need something with a USB port so that you can flash the Pico with your code.
+You will need some sort of computer to write the code on. You will need something with a USB port so that you can flash the Pico with your code. You will need some sort of tool which can flash the Pico with your code.
 
 #### My setup
-- A MacBook Pro
-- JetBrains PyCharm (community edition)
-- Jetbrains MicroPython plugin
-- Thonny (just for adding the MicroPython firmware to the Pico and then not touched again)
+- development system: A MacBook Pro
+- IDE: JetBrains PyCharm (community edition)
+- IDE-plugin: Jetbrains MicroPython plugin
+- Tool for initial Pico setup: Thonny (just for adding the MicroPython firmware to the Pico and then not touched again)
 
-#### High level step-by-step instructions on how to setup
+#### High level step-by-step instructions on how to set up a Pico like I did
 - Install Thonny _(I do not recommend pip for this as it resulted in SSL errors for me)_
 - Connect the Pico to your computer via USB
 - Use Thonny to add the MicroPython firmware to the Pico
 - Install PyCharm
 - Install the MicroPython plugin for PyCharm
-- Write this code in PyCharm
+- Write some code in PyCharm :point_down: into a file called `main.py`
 ```python
 import machine
 import utime
@@ -80,20 +84,20 @@ while True:
     led_w.toggle()
     utime.sleep(1)
 ```
-- use PyCharm to flash the code to the Pico
+- use PyCharm to flash `main.py` to the Pico (this will also run your code on the Pico)
 - Enjoy the little on-board LED blinking
-- You are now ready to start working on the mailbox project
+- If you got flashing lights :point_up: then you are now ready to start working on the mailbox project
 
-### Bare bones setup
+### Bare-bones wiring setup
 _I am sure you won't have any issues, you don't need any of those flashy LEDs ;-)_
 
 __TODO: wiring diagram from Fritzing__
 
-### Full fat breadboard setup
+### Full fat breadboard wiring setup
 picture of breadboard<br>
 __TODO: wiring diagram from Fritzing__
 
-### Sticking it in an actual mailbox
+### Assembly and sticking it in an actual mailbox
 __TODO: Stick it all into an actual mailbox__
 
 ### Power draw, expected and actual (and adventures in power management)
@@ -102,22 +106,28 @@ __TODO: Calculate Pico expected power usage__
 
 ## Platform
 I went with a Raspberry Pi Pico WH running MicroPython since I have previous experience with Python and the tooling around Raspberry devices is usually quite nice to work with.
-In addition to the hardware I also use a Home Assistant server (not that it matters but runs in Raspberry Pi4) to visualize the data from the mailbox.
+In addition to the hardware I also use a Home Assistant server (not that it matters but it runs on Raspberry Pi4) to visualize the data from the mailbox.
+I also use ntfy.sh to send notifications to my phone when mail has been delivered.
 
 This is local first setup (with the option to pay for Home Assistant Cloud in the future if I should want to).
-In order to still get notifications on my phone I have set up a little companion app which subscribes to topic the Pico can post to. I went with https://ntfy.sh/ for this,
+In order to still get notifications on my phone I have set up a little companion app which subscribes to topic the Pico can post to. I went with https://ntfy.sh/ for this.
 
 ### Elaboration
 I consider cloud functionality to be an unnecessary attack vector and an inconvenience for most of my use cases. Sure, it might be occasionally nice to have, but I prefer to keep things local and under my control.
-This and the truly outstanding tooling around Raspberry Pi devices is why I went with Home Assistant on a Raspberry Pi.
+This preference and the truly outstanding tooling around Raspberry Pi devices is why I went with Home Assistant on a Raspberry Pi (instead of some cloud service).
 
 I chose a MacBook Pro for my development environment simply because I have one. Without the MBP I would have used a Linux machine with all the same tooling.
-Also, we are in Småland so why pay for a cloud service unless you need to?
+Also, we are in Småland so why pay for things unless you need to?
 
 (it makes sense to pay for a service such a GCP or AWS for when you don't want to or cant host your own metal. Using a cloud service to see the temperature in the room you are in is almost perverse)
 
+### Scaling
+This little hobby project is not designed with scaling in mind. A Pico is gross overkill for what this project does. The physical nature of the project also doesn't scale well as it currently needs custom installation to meet the specific mailbox the user happens to have.
+HOWEVER, the software aspects of this project are fairly well suited for scale. The system is very quiet on the network, only sending about 3 request per day so any server setup to receive the data would be able to handle a large number of mailboxes.
+The selected push notification service (ntfy.sh) is also well suited for scale as it has paid service and should be able to handle a large number of notifications. It is also open enough to allow you to host your very own ntfy server which you can scale to your heart's delight.
+
 ## Code
-The code can be found in this repo, you want the main.py file. Stick that on a Pico W (or WH) and watch it go.
+The code can be found in this repo, you want the `main.py` file. Stick that on a Pico W (or WH) and watch it go.
 I have taken some care to handle different setups from my own (you don't need all of my sensors, the buzzer nor the LEDs). You can also configure the pins to match your setup by editing the `settings.yaml` file.
 
 The code is split into two main parts:
@@ -257,19 +267,45 @@ There is little to no error handling for hardware malfunctions at run time (say 
 #### What could have (reasonably) been done
 Automated testing in a CI/CD pipeline would have been nice to have. I have not set this up as time is still not infinite and it would require having my own Github Runner in order to have a Pico hooked up to be able to test the whole system. 
 
-## Data visualization
+## Connectivity and Data visualization
 Mailbox is equipped with logic to send data to a Home Assistant server, which can then be used to visualize the data in a pretty straight forward way.<br><br>
+Data is, on average, sent to Home Assistant 2 times per day IF mail is delivered that day. On average this results in about 12 request per week (one request to tell Home Assistant there is mail in the mailbox, one request to for when the system is reset, one request to tell Ntfy to notify the subscribers and one request to Ntfy for when the mailbox has been reset)
+This current setup is relying on WiFi for all data communication (but the full fat setup also has lights and a buzzer to communicate with the user)
+
+Bog-standard HTTP requests are used to send data to Home Assistant and to NTFY. The request frequency and data amount is so low that it is not worth optimizing for this project in its current scope.
+If anything, WiFi is gross overkill for the data transfer needs (it is also probably the biggest power drain of this system) of this project BUT it had the one main advantage of being an already available network on site and being easy to work with. WiFi was used due to convenience, not because it is the best tool for the job.
+Given my bandwidth and range needs, I'd argue that Zigbee would be a better choice. LoRa would be overkill in terms of range and would also incur a higher cost for the hardware and operating costs (but would be nice from a power draw point of view). LTE offers loads of bandwidth (which I don't need) and would also add costs for the hardware and running.
+Low Energy Bluetooth would also be a good choice, provided the mailbox is in range of the Home Assistant. (This would also require reworking the data gets sent from the Pico to the Home Assistant server and Ntfy. A good technological choice nonetheless)
+
+The main reason to go with Home Assistant as my "database" and visualization solution is much like the decision to go with Wifi, out of convenience.
+I already had a Home Assistant setup. It has built in functionality for doing what I need out of this mailbox system. It could be argued that going with Grafana would have been a better choice for visualization, but with binary output, from only one source, which changes at most twice per day, I don't see the need for a more advanced visualization tool.
+There is currently no automation setup which is using the input from this mailbox system. Since mail (currently) needs to be fetched manually, I just didn't see a need to go beyond dashboard and push notifications.
+
+## Data security/sensitivity considerations
+The data transmitted by Mailbox is a binary mail or no mail state. It lacks any PII and is not sensitive in any way.
+The Ntfy topic is wide open, anyone can subscribe to it if they'd like to. This could, in theory, be used to plan mail theft from me, by waiting near by and then springing to action when the mail delivery event is fired.
+However, the mail delivery schedule is public and it would be about as easy to just wait nearby for when the mail truck goes by. Since my mailbox is basically just a box with a lid, which anyone can open, I figured I'm not really making things much worse by adding this mailbox notification system to it. If anything, I am reducing the on site attack vector by probably getting my mail sooner than I would otherwise.
+
 __TODO: ADD SCREENSHOT__
+
 
 ## In the end
 I have a mailbox that can tell me if mail has been delivered today or not. I can also see this information in Home Assistant and get notifications on my phone if I want to.
-Looking back I cannot help but feel like this kind of microcontroller is gross overkill for this project but we need to also factor in speed of development, which is hard to beat for a project with a low low volume of one.
+Looking back I cannot help but feel like this kind of microcontroller is gross overkill for this project, but we need to also factor in speed of development, which is hard to beat for a project with a low low volume of one.
 
-I can probably optimize things a fair bit by only powering on the Pico when the mailbox is opened, immediately going into mail detection mode and trying to connect to the wifi and send the message (mail or no mail) and then shutting down again. That would mean that I'd have a sort of hardware power switch in the lid which can turn the Pico on but not off when the lid closes again.
-Since the Pico is a dual core microcontroller, I could also have one core running the main loop and the other core handling the wifi connection and message sending. This would allow me to have purer logic (as the current implementation can in practice miss mail delivery samples if it is in the middle of flashing ligths or buzzing a buzzer since only one thread is used and execution is strictly sequential)
-I could implement requests to a somewhat accessible PostNord API to determine if today is a PostNord delivery day or not. This could be displayed as a sensor in Home Assistant too.
-I could add a little ultra sound sensor to detect if something is by the mailbox for x seconds (or longer) to try to figure out if the post car has been there or not (it would take at least a solid 5-10 seconds for a mailman to stop, deliver mail and do a burnout).
-I could add a little handy button for the mailman to press (if they feel like it) to explicitly trigger a mail delivery event.
+There are about a thousand things I could have done differently and better.
+Mainly power draw is something I'd be keen to improve. Consider the following:
+
+- With working power modes on a Pico, I would be able to sleep for most of the time (not much mail being delivered at night().
+- Having the radio on all of the time really isn't needed. It could be turned on for a few seconds only when requests need to go out. This would add a slight delay since wifi would need to power up and connect before any notifications can go out, but I'd say it would still be a better design choice.
+- With a simple circuit, the Pico could actually be powered on only when the mailbox lid has been lifted (this drawing no power at all until it is needed) and then staying on only until mail has been detected, at which point it would shut down again until the next time the lid is lifted.
+- Since the Pico is a dual core microcontroller, I could also have one core running the main loop and the other core handling the wifi connection and message sending. This would allow me to have purer logic (as the current implementation can in practice miss mail delivery samples if it is in the middle of flashing ligths or buzzing a buzzer since only one thread is used and execution is strictly sequential)
+- I could implement requests to a somewhat accessible PostNord API to determine if today is a PostNord delivery day or not. This could be displayed as a sensor in Home Assistant too.
+- I could add a little ultra sound sensor to detect if something is by the mailbox for x seconds (or longer) to try to figure out if the post car has been there or not (it would take at least a solid 5-10 seconds for a mailman to stop, deliver mail and do a burnout).
+- I could add a little handy button for the mailman to press (if they feel like it) to explicitly trigger a mail delivery event.
+
 Next up after that I reccon we'd be in image processing territory. But really, I 100% expect a system with just one button and an electric flip switch hooked up to a light (which would then stay on) to work just about as well as anything mentioned ☝️
 
 Overall, I am pleased with my setup and choice of tools. Home Assistant performed well and was a dream to setup. Ntfy.sh was also a breeze to setup and use. The Pico can be a bit flaky in terms of connecting to wifi but wasn't difficult to work around with a few lines of code.
+
+_(not that anyone asked but I listened to a fair bit of [SMK - Fest i Valen](https://sv.wikipedia.org/wiki/Fest_i_valen_(musikalbum)) during this project)_
