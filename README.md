@@ -101,6 +101,17 @@ __TODO: wiring diagram from Fritzing__
 __TODO: Stick it all into an actual mailbox__
 
 ### Power draw, expected and actual (and adventures in power management)
+A pico (with WiFi) can draw as much as 0.5W at startup (depending on workload this tends to level out at about 0.15W).
+Mailbox does very little work and in fact spends most of the time sleeping, so the expected power usage is at 0.15W.
+
+HOWEVER, there are additional LEDs and a Buzzer connected, which will draw a bit of power when used. The thing is that they are used so rarely and for such a short time that this additional power draw becomes within the margin of measurement error for the expected power usage.
+All the used sensors are passive and draw no power at all for the most part and negligible power when they are used.
+
+Using the Wifi to send request will draw more power than just idling, but again, this is done so rarely that it over time becomes negligible.
+
+(Mailbox could/should be redesigned to use pretty much no power at all by only switching on when the mailbox lid is lifted and then shutting down again after a few seconds. This would require a bit of extra hardware and a bit of extra code, but would be a good design choice for a battery powered mailbox system. It would also only switch on the radio and connect to Wifi, if and when mail has been detected. Mailbox is not designed to run on battery power as batteries tend to struggle in low temperatures and mailboxes have a tendency to be placed outside in the cold.)
+
+
 __TODO: Measure power draw__
 __TODO: Calculate Pico expected power usage__
 
