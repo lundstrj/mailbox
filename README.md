@@ -91,10 +91,10 @@ while True:
 ### Bare-bones wiring setup
 _I am sure you won't have any issues, you don't need any of those flashy LEDs ;-)_
 
-![](/Users/lundstrj/repos/mailbox/media/bare_bones_bb.png)
+![](media/bare_bones_bb.png)
 
 ### Full fat breadboard wiring setup
-![](/Users/lundstrj/repos/mailbox/media/full_fat_bb.png)
+![](media/full_fat_bb.png)
 
 ### Assembly and sticking it in an actual mailbox
 __TODO: Stick it all into an actual mailbox__
