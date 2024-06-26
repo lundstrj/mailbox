@@ -23,14 +23,13 @@ _(it took me significantly longer, but I was also prototyping and testing a lot 
 __TODO: picture of mailbox__<br>
 
 
-
+Start sequence
 https://github.com/lundstrj/mailbox/assets/1045735/3aaea723-b65c-47a8-b1be-75d47a6f56f5
 
-
-
+Tabletop operations
 https://github.com/lundstrj/mailbox/assets/1045735/d2899a08-660c-4be2-924c-64ea70c737d7
 
-
+Notifications
 https://github.com/lundstrj/mailbox/assets/1045735/c4a27314-9a62-4c77-ac87-b9dbb52fd659
 
 
@@ -45,6 +44,18 @@ The main insight is the binary state of mail present in my mailbox, or not. With
 
 ## Bill of materials
 Basically you need a microcontroller and a couple of buttons. I used a Raspberry Pi Pico W and some push buttons and a tilt sensor (mainly to be fancy). You can get away with only one push button if you'd like, but I will be using the following:
+
+| ![](/Users/lundstrj/repos/mailbox/media/pico.jpeg) | Raspberry Pi Pico W | 1 | 109 SEK  |  https://www.electrokit.com/raspberry-pi-pico-wh |
+|--|---------------------|---|----------|---|
+|  ![](/Users/lundstrj/repos/mailbox/media/bread_board.jpeg) | Breadboard          | 1 | 69 SEK   |  https://www.electrokit.com/kopplingsdack-840-anslutningar |
+| ![](/Users/lundstrj/repos/mailbox/media/push_button.jpeg) | Push button         | 3 | 16.5 SEK |  https://www.electrokit.com/tryckknapp-1-pol-off-onmetall-gron-lodoron |
+| ![](/Users/lundstrj/repos/mailbox/media/tilt_switch.jpeg) | Tilt switch/sensor  | 1 | 15 SEK   |  https://www.electrokit.com/tiltswitch-5vdc-vertikal |
+|  | male-male jumper wires | 1 | 39 SEK   | https://www.electrokit.com/kopplingstrad-byglar-for-kopplingsdack-mjuka-65st |
+|  | male-female jumper wires | 1 | 29 SEK   | https://www.electrokit.com/labsladd-1-pin-hane-hona-150mm-10-pack |
+|  | Green LED           | 1 | 8 SEK    | https://www.electrokit.com/led-5mm-gron-inbyggt-motstand-5v |
+|  | Yellow LED          | 1 | 8 SEK    | https://www.electrokit.com/led-5mm-gul-inbyggt-motstand-5v |
+|  | Red LED             | 1 | 8 SEK    | https://www.electrokit.com/led-5mm-rod-inbyggt-motstand-5v |
+
 
 - [ ] 1x Raspberry Pi Pico W
 - [ ] 3x push buttons with low force actuation
