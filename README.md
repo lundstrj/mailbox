@@ -23,13 +23,16 @@ _(it took me significantly longer, but I was also prototyping and testing a lot 
 __TODO: picture of mailbox__<br>
 
 
-Start sequence
+Start sequence<br>
+
 https://github.com/lundstrj/mailbox/assets/1045735/3aaea723-b65c-47a8-b1be-75d47a6f56f5
 
-Tabletop operations
+Tabletop operations<br>
+
 https://github.com/lundstrj/mailbox/assets/1045735/d2899a08-660c-4be2-924c-64ea70c737d7
 
-Notifications
+Notifications<br>
+
 https://github.com/lundstrj/mailbox/assets/1045735/c4a27314-9a62-4c77-ac87-b9dbb52fd659
 
 
