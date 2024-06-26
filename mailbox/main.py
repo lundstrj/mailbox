@@ -85,8 +85,8 @@ if home_assistant_token == 'not_set' or home_assistant_token == 'your_home_assis
 home_assistant_unique_id: str = settings.get('home_assistant_unique_id', 'net_set')
 home_assistant_entity_id: str = settings.get('home_assistant_entity_id', 'not_set')
 consecutive_tilt_sensor_active_needed_to_trigger: int = int(
-    settings.get('consecutive_tilt_sensor_active_needed_to_trigger', 10))
-consecutive_lid_open_needed_to_trigger: int = int(settings.get('consecutive_lid_open_needed_to_trigger', 10))
+    settings.get('consecutive_tilt_sensor_active_needed_to_trigger', 5))
+consecutive_lid_open_needed_to_trigger: int = int(settings.get('consecutive_lid_open_needed_to_trigger', 5))
 consecutive_bottom_sensor_active_needed_to_trigger: int = int(settings.get(
     'consecutive_bottom_sensor_active_needed_to_trigger', 10))
 max_wifi_connect_attempts_before_resetting_device: int = int(
@@ -505,9 +505,8 @@ def main():
         else:
             debug_print("It is not between 18:00 and 06:00, continuing with the program")
         """
-        led_on_board.high()
         time.sleep(sampling_interval)
-        led_on_board.low()
+        flash_led(led_on_board, 2)
         if has_lid_sensor():
             if sensor_lid.value():
                 debug_print("Lid is open", level=DEBUG)
@@ -580,6 +579,7 @@ def main():
             while True:
                 debug_print("Going to sleep for 10 seconds")
                 time.sleep(10)
+                flash_led(led_on_board, 1)
                 debug_print("Waking up from sleep")
                 debug_print("Checking if the reset sensor is active")
                 if has_reset_sensor():
@@ -592,6 +592,7 @@ def main():
                         has_mail_been_delivered = False
                         past_samples = []
                         send_telemetry_to_ntfy(optional_message="Mailbox has been reset")
+                        send_telemetry_to_ha(False)
                         break
                     else:
                         debug_print("Reset sensor is not active, will go to sleep again")
