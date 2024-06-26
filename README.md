@@ -49,7 +49,7 @@ Basically you need a microcontroller and a couple of buttons. I used a Raspberry
 |--|---------------------|---|----------|---|
 | ![](/media/pico.jpeg) | Raspberry Pi Pico W | 1 | 109 SEK  |  https://www.electrokit.com/raspberry-pi-pico-wh |
 | ![](/media/bread_board.jpeg) | Breadboard          | 1 | 69 SEK   |  https://www.electrokit.com/kopplingsdack-840-anslutningar |
-| ![](/media/push_button.jpeg) | Push button         | 3 | 16.5 SEK |  https://www.electrokit.com/tryckknapp-1-pol-off-onmetall-gron-lodoron |
+| ![](/media/push_button_.jpeg) | Push button         | 3 | 16.5 SEK |  https://www.electrokit.com/tryckknapp-1-pol-off-onmetall-gron-lodoron |
 | ![](/media/tilt_switch.jpeg) | Tilt switch/sensor  | 1 | 15 SEK   |  https://www.electrokit.com/tiltswitch-5vdc-vertikal |
 | ![](/media/jumper_wires.jpeg) | male-male jumper wires | 1 | 39 SEK   | https://www.electrokit.com/kopplingstrad-byglar-for-kopplingsdack-mjuka-65st |
 | ![](/media/jumper_wires_male_female.jpeg) | male-female jumper wires | 1 | 29 SEK   | https://www.electrokit.com/labsladd-1-pin-hane-hona-150mm-10-pack |
@@ -302,7 +302,9 @@ The data transmitted by Mailbox is a binary mail or no mail state. It lacks any 
 The Ntfy topic is wide open, anyone can subscribe to it if they'd like to. This could, in theory, be used to plan mail theft from me, by waiting near by and then springing to action when the mail delivery event is fired.
 However, the mail delivery schedule is public and it would be about as easy to just wait nearby for when the mail truck goes by. Since my mailbox is basically just a box with a lid, which anyone can open, I figured I'm not really making things much worse by adding this mailbox notification system to it. If anything, I am reducing the on site attack vector by probably getting my mail sooner than I would otherwise.
 
-__TODO: ADD SCREENSHOT__
+![](/media/home_assistant_has_mail.png)
+![](/media/home_assistant_no_mail.png)
+![](/media/home_assistant_history.png)
 
 
 ## In the end
