@@ -21,7 +21,7 @@ If you have my code, all the hardware and a mailbox and know how to flash code o
 _(it took me significantly longer, but I was also prototyping and testing a lot of things along the way)_
 
 __TODO: picture of mailbox__<br>
-__TODO: video of operation__
+![](/Users/lundstrj/repos/mailbox/media/desktop_demo.mp4)
 
 ## Objective
 ### Why?
@@ -91,11 +91,10 @@ while True:
 ### Bare-bones wiring setup
 _I am sure you won't have any issues, you don't need any of those flashy LEDs ;-)_
 
-__TODO: wiring diagram from Fritzing__
+![](/Users/lundstrj/repos/mailbox/media/bare_bones_bb.png)
 
 ### Full fat breadboard wiring setup
-picture of breadboard<br>
-__TODO: wiring diagram from Fritzing__
+![](/Users/lundstrj/repos/mailbox/media/full_fat_bb.png)
 
 ### Assembly and sticking it in an actual mailbox
 __TODO: Stick it all into an actual mailbox__
