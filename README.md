@@ -338,6 +338,8 @@ Mainly power draw is something I'd be keen to improve. Consider the following:
 Next up after that I reccon we'd be in image processing territory. But really, I 100% expect a system with just one button and an electric flip switch hooked up to a light (which would then stay on) to work just about as well as anything mentioned ☝️
 
 Overall, I am pleased with my setup and choice of tools. Home Assistant performed well and was a dream to setup. Ntfy.sh was also a breeze to setup and use. The Pico can be a bit flaky in terms of connecting to wifi but wasn't difficult to work around with a few lines of code.
+![](/media/toast.png)![](/media/toast.png)![](/media/toast.png)![](/media/toast.png) 4 toast points out of 5, [Kanonkul](https://youtu.be/pYPjFpixTP8?t=57).
 
 _(not that anyone asked but I listened to a fair bit of [SMK - Fest i Valen](https://sv.wikipedia.org/wiki/Fest_i_valen_(musikalbum)) during this project)_<br>
 _(<a href="https://www.flaticon.com/free-icons/mailbox" title="mailbox icons">Mailbox icons created by Nikita Golubev - Flaticon</a>)_
+_(<a href="https://www.flaticon.com/free-icons/bread" title="bread icons">Bread icons created by Freepik - Flaticon</a>)_
