@@ -135,6 +135,9 @@ I also use ntfy.sh to send notifications to my phone when mail has been delivere
 This is local first setup (with the option to pay for Home Assistant Cloud in the future if I should want to).
 In order to still get notifications on my phone I have set up a little companion app which subscribes to topic the Pico can post to. I went with https://ntfy.sh/ for this.
 
+### High level diagram of the system
+![](media/mailbox_diagram.png)
+
 ### Elaboration
 I consider cloud functionality to be an unnecessary attack vector and an inconvenience for most of my use cases. Sure, it might be occasionally nice to have, but I prefer to keep things local and under my control.
 This preference and the truly outstanding tooling around Raspberry Pi devices is why I went with Home Assistant on a Raspberry Pi (instead of some cloud service).
@@ -282,7 +285,7 @@ def connect() -> network.WLAN:
 #### What has been done
 - Mailbox has been extensively tested in my lab as an assembled system.
 - I have tested each individual sensor standalone to ensure that they work as expected (before assembly)
-- The wifi connection, the Home Assistant connection and the ntfy.sh connection has also been tested in isolation and have simple error handling for common problems.
+- The WiFi connection, the Home Assistant connection and the ntfy.sh connection has also been tested in isolation and have simple error handling for common problems.
 - There are some basic preflight checks before the main loop starts to ensure that the system is in a good state before starting the main loop.
 - The classes imported from the Machine library have been mocked in mock.py which allows tests to be carried out on the logic separately from the hardware.  
 
@@ -307,11 +310,12 @@ I already had a Home Assistant setup. It has built in functionality for doing wh
 There is currently no automation setup which is using the input from this mailbox system. Since mail (currently) needs to be fetched manually, I just didn't see a need to go beyond dashboard and push notifications.
 
 Getting push notifications:
+
 https://github.com/lundstrj/mailbox/assets/1045735/c4a27314-9a62-4c77-ac87-b9dbb52fd659
 
-What things look like in Home Assistant
+What things look like in Home Assistant<br>
 ![](/media/home_assistant_has_mail.png)
-![](/media/home_assistant_no_mail.png)
+![](/media/home_assistant_no_mail.png)<br>
 ![](/media/home_assistant_history.png)
 
 ## Data security/sensitivity considerations
@@ -341,5 +345,5 @@ Overall, I am pleased with my setup and choice of tools. Home Assistant performe
 ![](/media/toast.png)![](/media/toast.png)![](/media/toast.png)![](/media/toast.png) 4 toast points out of 5, [Kanonkul](https://youtu.be/pYPjFpixTP8?t=57).
 
 _(not that anyone asked but I listened to a fair bit of [SMK - Fest i Valen](https://sv.wikipedia.org/wiki/Fest_i_valen_(musikalbum)) during this project)_<br>
-_(<a href="https://www.flaticon.com/free-icons/mailbox" title="mailbox icons">Mailbox icons created by Nikita Golubev - Flaticon</a>)_
+_(<a href="https://www.flaticon.com/free-icons/mailbox" title="mailbox icons">Mailbox icons created by Nikita Golubev - Flaticon</a>)_<br>
 _(<a href="https://www.flaticon.com/free-icons/bread" title="bread icons">Bread icons created by Freepik - Flaticon</a>)_
