@@ -48,18 +48,19 @@ The main insight is the binary state of mail present in my mailbox, or not. With
 ## Bill of materials
 Basically you need a microcontroller and a couple of buttons. I used a Raspberry Pi Pico W and some push buttons and a tilt sensor (mainly to be fancy). You can get away with only one push button if you'd like, but I will be using the following:
 
-| Component image | Component name | Quantity | Price  |  Product link |
-|--|---------------------|---|----------|---|
-| ![](/media/pico.jpeg) | Raspberry Pi Pico W | 1 | 109 SEK  |  https://www.electrokit.com/raspberry-pi-pico-wh |
-| ![](/media/bread_board.jpeg) | Breadboard          | 1 | 69 SEK   |  https://www.electrokit.com/kopplingsdack-840-anslutningar |
-| ![](/media/push_button.jpeg) | Push button         | 3 | 16.5 SEK |  https://www.electrokit.com/tryckknapp-1-pol-off-onmetall-gron-lodoron |
-| ![](/media/tilt_switch.jpeg) | Tilt switch/sensor  | 1 | 15 SEK   |  https://www.electrokit.com/tiltswitch-5vdc-vertikal |
-| ![](/media/jumper_wires.jpeg) | male-male jumper wires | 1 | 39 SEK   | https://www.electrokit.com/kopplingstrad-byglar-for-kopplingsdack-mjuka-65st |
-| ![](/media/jumper_wires_male_female.jpeg) | male-female jumper wires | 1 | 29 SEK   | https://www.electrokit.com/labsladd-1-pin-hane-hona-150mm-10-pack |
-| ![](/media/green_led.jpeg) | Green LED           | 1 | 8 SEK    | https://www.electrokit.com/led-5mm-gron-inbyggt-motstand-5v |
-| ![](/media/yellow_led.jpeg) | Yellow LED          | 1 | 8 SEK    | https://www.electrokit.com/led-5mm-gul-inbyggt-motstand-5v |
-| ![](/media/red_led.jpeg) | Red LED             | 1 | 8 SEK    | https://www.electrokit.com/led-5mm-rod-inbyggt-motstand-5v |
-| ![](/media/mailbox.jpeg) | Mailbox             | 1 | 299 SEK    | [https://www.electrokit.com/led-5mm-rod-inbyggt-motstand-5v](https://www.biltema.se/fritid/tradgard/entre/brevlador/brevlada-med-las-vit-2000053657) |
+| Component image                           | Component name           | Quantity | Price    |  Product link |
+|-------------------------------------------|--------------------------|----------|----------|---|
+| ![](/media/pico.jpeg)                     | Raspberry Pi Pico W      | 1        | 109 SEK  |  https://www.electrokit.com/raspberry-pi-pico-wh |
+| ![](/media/bread_board.jpeg)              | Breadboard               | 1        | 69 SEK   |  https://www.electrokit.com/kopplingsdack-840-anslutningar |
+| ![](/media/push_button.jpeg)              | Push button              | 3        | 16.5 SEK |  https://www.electrokit.com/tryckknapp-1-pol-off-onmetall-gron-lodoron |
+| ![](/media/tilt_switch.jpeg)              | Tilt switch/sensor       | 1        | 15 SEK   |  https://www.electrokit.com/tiltswitch-5vdc-vertikal |
+| ![](/media/jumper_wires.jpeg)             | male-male jumper wires   | 1        | 39 SEK   | https://www.electrokit.com/kopplingstrad-byglar-for-kopplingsdack-mjuka-65st |
+| ![](/media/jumper_wires_male_female.jpeg) | male-female jumper wires | 1        | 29 SEK   | https://www.electrokit.com/labsladd-1-pin-hane-hona-150mm-10-pack |
+| ![](/media/green_led.jpeg)                | Green LED                | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-gron-inbyggt-motstand-5v |
+| ![](/media/yellow_led.jpeg)               | Yellow LED               | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-gul-inbyggt-motstand-5v |
+| ![](/media/red_led.jpeg)                  | Red LED                  | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-rod-inbyggt-motstand-5v |
+| ![](/media/mailbox.jpeg)                  | Mailbox                  | 1        | 299 SEK  | https://www.biltema.se/fritid/tradgard/entre/brevlador/brevlada-med-las-vit-2000053657 |
+| ![](/media/buzzer.jpeg)                   | Buzzer                   | 1        | 39 SEK   | https://www.electrokit.com/piezohogtalare-aktiv                                                                                                                                                   |
 
 ## Assembly instructions
 I used a Pico WH on a breadboard to prototype this. I also added LEDs and a buzzer to help me see the state without hooking up a debugger. You can do that too if you want to, or just skip all of that and wire up the bare bones setup in that section :point_down:
