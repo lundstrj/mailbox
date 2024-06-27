@@ -1,3 +1,4 @@
+![](/media/mailbox.png)
 # Mailbox
 _Johan Lundström - jl226ki_
 
@@ -337,4 +338,5 @@ Next up after that I reccon we'd be in image processing territory. But really, I
 
 Overall, I am pleased with my setup and choice of tools. Home Assistant performed well and was a dream to setup. Ntfy.sh was also a breeze to setup and use. The Pico can be a bit flaky in terms of connecting to wifi but wasn't difficult to work around with a few lines of code.
 
-_(not that anyone asked but I listened to a fair bit of [SMK - Fest i Valen](https://sv.wikipedia.org/wiki/Fest_i_valen_(musikalbum)) during this project)_
+_(not that anyone asked but I listened to a fair bit of [SMK - Fest i Valen](https://sv.wikipedia.org/wiki/Fest_i_valen_(musikalbum)) during this project)_<br>
+_(the mailbox graphics at the top of this file was made by <a href="https://www.flaticon.com/free-icons/mailbox" title="mailbox icons">Mailbox icons created by Nikita Golubev - Flaticon</a>)_
