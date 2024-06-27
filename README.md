@@ -1,4 +1,4 @@
-![](/media/mailbox_small.png)
+![](/media/mailbox_medium.png)
 
 # Mailbox
 _Johan Lundström - jl226ki_
