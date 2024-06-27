@@ -32,7 +32,10 @@ https://github.com/lundstrj/mailbox/assets/1045735/d2899a08-660c-4be2-924c-64ea7
 Notifications
 https://github.com/lundstrj/mailbox/assets/1045735/c4a27314-9a62-4c77-ac87-b9dbb52fd659
 
-
+### What different blinking (and buzzing) patterns mean
+- __Green, yellow and red LEDS filling up and going back down__ - Mailbox is in the init state, checking sensors and connecting to wifi
+- __On Board LED blinking once per second__ - Mailbox is powered, connected to wifi on and running (waiting for mail)
+- __On Board LED blinking once every 10 seconds__ - Mailbox is powered, has detected mail and is now in a sort of sleep mode (waiting to be reset by the user)
 
 ## Objective
 ### Why?
@@ -281,7 +284,7 @@ def connect() -> network.WLAN:
 There is little to no error handling for hardware malfunctions at run time (say one sensor out of 3 starts misbehaving, there is currently no logic to handle that)
 
 #### What could have (reasonably) been done
-Automated testing in a CI/CD pipeline would have been nice to have. I have not set this up as time is still not infinite and it would require having my own Github Runner in order to have a Pico hooked up to be able to test the whole system. 
+Automated testing in a CI/CD pipeline would have been nice to have. I have not set this up as time is still not infinite, and it would require having my own Github Runner in order to have a Pico hooked up to be able to test the whole system.
 
 ## Connectivity and Data visualization
 Mailbox is equipped with logic to send data to a Home Assistant server, which can then be used to visualize the data in a pretty straight forward way.<br><br>
