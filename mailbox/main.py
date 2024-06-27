@@ -223,12 +223,78 @@ def has_buzzer() -> bool:
         return False
 
 
+def has_led_green() -> bool:
+    try:
+        led_green.value()
+        return True
+    except AttributeError:
+        return False
+
+
+def has_led_yellow() -> bool:
+    try:
+        led_yellow.value()
+        return True
+    except AttributeError:
+        return False
+
+
+def has_led_red() -> bool:
+    try:
+        led_red.value()
+        return True
+    except AttributeError:
+        return False
+
+
 def set_all_output_pins(to_low: bool = True, to_high: bool = False) -> None:
     for pin in output_pins:
         if to_low:
             pin.low()
         elif to_high:
             pin.high()
+
+
+def flash_green_led(flashes: int = 5, flash_duration: float = 0.1) -> None:
+    if has_led_green():
+        flash_led(led_green, flashes, flash_duration)
+    else:
+        debug_print("No green led connected/configured")
+
+
+def flash_yellow_led(flashes: int = 5, flash_duration: float = 0.1) -> None:
+    if has_led_yellow():
+        flash_led(led_yellow, flashes, flash_duration)
+    else:
+        debug_print("No yellow led connected/configured")
+
+
+def flash_red_led(flashes: int = 5, flash_duration: float = 0.1) -> None:
+    if has_led_red():
+        flash_led(led_red, flashes, flash_duration)
+    else:
+        debug_print("No red led connected/configured")
+
+
+def off_green_led() -> None:
+    if has_led_green():
+        led_green.low()
+    else:
+        debug_print("No green led connected/configured")
+
+
+def off_yellow_led() -> None:
+    if has_led_yellow():
+        led_yellow.low()
+    else:
+        debug_print("No yellow led connected/configured")
+
+
+def off_red_led() -> None:
+    if has_led_red():
+        led_red.low()
+    else:
+        debug_print("No red led connected/configured")
 
 
 def flash_led(led: Pin, flashes: int = 5, flash_duration: float = 0.1) -> None:
@@ -511,22 +577,24 @@ def main():
             if sensor_lid.value():
                 debug_print("Lid is open", level=DEBUG)
                 lid_open = True
-                led_yellow.high()
-                time.sleep(0.1)
+                flash_yellow_led(1)
             elif not sensor_lid.value():
                 debug_print("Lid is closed", level=DEBUG)
                 lid_open = False
-                led_yellow.low()
+                off_yellow_led()
+        else:
+            lid_open = False
         if has_bottom_sensor():
             if not sensor_bottom.value():
                 debug_print("sensor_bottom is active", level=DEBUG)
                 bottom_sensor_active = True
-                led_red.high()
-                time.sleep(0.1)
+                flash_red_led()
             elif sensor_bottom.value():
                 debug_print("sensor_bottom is inactive", level=DEBUG)
                 bottom_sensor_active = False
-                led_red.low()
+                off_red_led()
+        else:
+            bottom_sensor_active = False
         if has_tilt_sensor():
             if sensor_tilt.value():
                 debug_print("sensor_tilt is active", level=DEBUG)
@@ -537,6 +605,8 @@ def main():
                 debug_print("sensor_tilt is inactive", level=DEBUG)
                 tilt_sensor_active = False
                 led_green.low()
+        else:
+            bottom_sensor_active = False
         if has_reset_sensor():
             if not sensor_reset.value():
                 debug_print("sensor_reset is active", level=DEBUG)
@@ -584,9 +654,12 @@ def main():
                 debug_print("Checking if the reset sensor is active")
                 if has_reset_sensor():
                     if not sensor_reset.value():
-                        flash_led(led_green, 2)
-                        flash_led(led_yellow, 2)
-                        flash_led(led_red, 2)
+                        if has_led_green():
+                            flash_led(led_green, 2)
+                        if has_led_yellow():
+                            flash_led(led_yellow, 2)
+                        if has_led_red():
+                            flash_led(led_red, 2)
                         signal_success(RESETTING)
                         debug_print("sensor_reset is active")
                         has_mail_been_delivered = False
