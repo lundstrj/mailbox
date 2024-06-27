@@ -123,9 +123,8 @@ Using the Wifi to send request will draw more power than just idling, but again,
 
 (Mailbox could/should be redesigned to use pretty much no power at all by only switching on when the mailbox lid is lifted and then shutting down again after a few seconds. This would require a bit of extra hardware and a bit of extra code, but would be a good design choice for a battery powered mailbox system. It would also only switch on the radio and connect to Wifi, if and when mail has been detected. Mailbox is not designed to run on battery power as batteries tend to struggle in low temperatures and mailboxes have a tendency to be placed outside in the cold.)
 
+Attempting to measure the power draw at the source (at the power supply or the wall plug) both resulted in measurements so low that it registers as 0W. The actual number is obviously higher than 0 as the device is indeed powered on but this still helps us gain some confidence in that hand-waving numbers mentioned :point_up: might be ballpark.
 
-__TODO: Measure power draw__
-__TODO: Calculate Pico expected power usage__
 
 ## Platform
 I went with a Raspberry Pi Pico WH running MicroPython since I have previous experience with Python and the tooling around Raspberry devices is usually quite nice to work with.
