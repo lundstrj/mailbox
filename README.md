@@ -23,13 +23,16 @@ _(it took me significantly longer, but I was also prototyping and testing a lot 
 __TODO: picture of mailbox__<br>
 
 
-Start sequence
+Start sequence<br>
+
 https://github.com/lundstrj/mailbox/assets/1045735/3aaea723-b65c-47a8-b1be-75d47a6f56f5
 
-Tabletop operations
+Tabletop operations<br>
+
 https://github.com/lundstrj/mailbox/assets/1045735/d2899a08-660c-4be2-924c-64ea70c737d7
 
-Notifications
+Notifications<br>
+
 https://github.com/lundstrj/mailbox/assets/1045735/c4a27314-9a62-4c77-ac87-b9dbb52fd659
 
 ### What different blinking (and buzzing) patterns mean
@@ -60,7 +63,7 @@ Basically you need a microcontroller and a couple of buttons. I used a Raspberry
 | ![](/media/yellow_led.jpeg)               | Yellow LED               | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-gul-inbyggt-motstand-5v |
 | ![](/media/red_led.jpeg)                  | Red LED                  | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-rod-inbyggt-motstand-5v |
 | ![](/media/mailbox.jpeg)                  | Mailbox                  | 1        | 299 SEK  | https://www.biltema.se/fritid/tradgard/entre/brevlador/brevlada-med-las-vit-2000053657 |
-| ![](/media/buzzer.jpeg)                   | Buzzer                   | 1        | 39 SEK   | https://www.electrokit.com/piezohogtalare-aktiv                                                                                                                                                   |
+| ![](/media/buzzer.jpeg)                   | Buzzer                   | 1        | 39 SEK   | https://www.electrokit.com/piezohogtalare-aktiv |
 
 ## Assembly instructions
 I used a Pico WH on a breadboard to prototype this. I also added LEDs and a buzzer to help me see the state without hooking up a debugger. You can do that too if you want to, or just skip all of that and wire up the bare bones setup in that section :point_down:
@@ -306,7 +309,9 @@ The data transmitted by Mailbox is a binary mail or no mail state. It lacks any 
 The Ntfy topic is wide open, anyone can subscribe to it if they'd like to. This could, in theory, be used to plan mail theft from me, by waiting near by and then springing to action when the mail delivery event is fired.
 However, the mail delivery schedule is public and it would be about as easy to just wait nearby for when the mail truck goes by. Since my mailbox is basically just a box with a lid, which anyone can open, I figured I'm not really making things much worse by adding this mailbox notification system to it. If anything, I am reducing the on site attack vector by probably getting my mail sooner than I would otherwise.
 
-__TODO: ADD SCREENSHOT__
+![](/media/home_assistant_has_mail.png)
+![](/media/home_assistant_no_mail.png)
+![](/media/home_assistant_history.png)
 
 
 ## In the end
