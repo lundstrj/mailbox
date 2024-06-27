@@ -11,6 +11,7 @@ A simple (perhaps even crude) Raspberry Pi Pico setup (in MicroPython) for sort 
 - The system is designed to be local first, but ntfy.sh is an optional cloud service (you don't need it, but it can be nice to have)
 - I have put some effort into making the code (`main.py`) somewhat robust and easy to configure for different setups (`settings.yaml` file)
 - Here is video of the system running and the three different sensors being active for a short time and the system signaling this by flashing the different LEDs.
+
 https://github.com/lundstrj/mailbox/assets/1045735/d2899a08-660c-4be2-924c-64ea70c737d7
 
 ## Overview
