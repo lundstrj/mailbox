@@ -3,6 +3,15 @@ _Johan Lundström - jl226ki_
 
 A simple (perhaps even crude) Raspberry Pi Pico setup (in MicroPython) for sort of knowing if someone (maybe even a mailman) or something :alien: has been fiddling with your mailbox today.
 
+## TL;DR
+- This is all about making a less dump mailbox, so I won't feel compelled to go check it 5+ times per day. (I would not go as far as calling it smart)
+- If any of the 3 sensors (tilt of the lid, lid opening, bottom switch being pushed by something in the mailbox) are triggered for long enough, the mailbox will send a request to Home Assistant and ntfy.sh
+- Power management could be better, but it is not terrible either.
+- The system is designed to be local first, but ntfy.sh is an optional cloud service (you don't need it, but it can be nice to have)
+- I have put some effort into making the code (`main.py`) somewhat robust and easy to configure for different setups (`settings.yaml` file)
+- Here is video of the system running and the three different sensors being active for a short time and the system signaling this by flashing the different LEDs.
+https://github.com/lundstrj/mailbox/assets/1045735/d2899a08-660c-4be2-924c-64ea70c737d7
+
 ## Overview
 ### The problem
 My current residence get intermittent mail delivery (supposedly every other day for mail, but packages can come any day). Some days you don't get anything even if it is a mail delivery day. The mail also gets delivered at different times depending on reasons (I suppose), so what does one do? Well you go check your mailbox at least 5+ times per day just to be sure.
@@ -23,22 +32,12 @@ _(it took me significantly longer, but I was also prototyping and testing a lot 
 __TODO: picture of mailbox__<br>
 
 
-Start sequence<br>
-
-https://github.com/lundstrj/mailbox/assets/1045735/3aaea723-b65c-47a8-b1be-75d47a6f56f5
-
-Tabletop operations<br>
-
-https://github.com/lundstrj/mailbox/assets/1045735/d2899a08-660c-4be2-924c-64ea70c737d7
-
-Notifications<br>
-
-https://github.com/lundstrj/mailbox/assets/1045735/c4a27314-9a62-4c77-ac87-b9dbb52fd659
-
 ### What different blinking (and buzzing) patterns mean
+_For your convenience, enjoy this incomplete list_
 - __Green, yellow and red LEDS filling up and going back down__ - Mailbox is in the init state, checking sensors and connecting to wifi
 - __On Board LED blinking once per second__ - Mailbox is powered, connected to wifi on and running (waiting for mail)
 - __On Board LED blinking once every 10 seconds__ - Mailbox is powered, has detected mail and is now in a sort of sleep mode (waiting to be reset by the user)
+- __Green, yellow and red LEDS toggle on/off in sequence once and a short 2x buzz__ - Mailbox is resetting (user has pressed the reset button)
 
 ## Objective
 ### Why?
@@ -159,6 +158,8 @@ The code is split into two main parts:
 ### Initialization / setup
 This part of the code is responsible for setting up the Pico and the sensors. It also reads the settings from the `settings.yaml` file and sets up the pins accordingly.
 It also connects to wifi, pings external services (such as Home Assistant) and tries to reach the public internet to see which features can be used.
+
+https://github.com/lundstrj/mailbox/assets/1045735/3aaea723-b65c-47a8-b1be-75d47a6f56f5
 
 ### Loading a yaml file in micro python
 Since standard yaml parsers are not available in MicroPython, I had to write my own. It is quite limited and does not handle all yaml files, but it lets me use yaml for settings and gets the job done.
@@ -303,14 +304,18 @@ The main reason to go with Home Assistant as my "database" and visualization sol
 I already had a Home Assistant setup. It has built in functionality for doing what I need out of this mailbox system. It could be argued that going with Grafana would have been a better choice for visualization, but with binary output, from only one source, which changes at most twice per day, I don't see the need for a more advanced visualization tool.
 There is currently no automation setup which is using the input from this mailbox system. Since mail (currently) needs to be fetched manually, I just didn't see a need to go beyond dashboard and push notifications.
 
+Getting push notifications:
+https://github.com/lundstrj/mailbox/assets/1045735/c4a27314-9a62-4c77-ac87-b9dbb52fd659
+
+What things look like in Home Assistant
+![](/media/home_assistant_has_mail.png)
+![](/media/home_assistant_no_mail.png)
+![](/media/home_assistant_history.png)
+
 ## Data security/sensitivity considerations
 The data transmitted by Mailbox is a binary mail or no mail state. It lacks any PII and is not sensitive in any way.
 The Ntfy topic is wide open, anyone can subscribe to it if they'd like to. This could, in theory, be used to plan mail theft from me, by waiting near by and then springing to action when the mail delivery event is fired.
 However, the mail delivery schedule is public and it would be about as easy to just wait nearby for when the mail truck goes by. Since my mailbox is basically just a box with a lid, which anyone can open, I figured I'm not really making things much worse by adding this mailbox notification system to it. If anything, I am reducing the on site attack vector by probably getting my mail sooner than I would otherwise.
-
-![](/media/home_assistant_has_mail.png)
-![](/media/home_assistant_no_mail.png)
-![](/media/home_assistant_history.png)
 
 
 ## In the end
