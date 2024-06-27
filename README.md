@@ -1,4 +1,5 @@
-![](/media/mailbox.png)
+![](/media/mailbox_small.png)
+
 # Mailbox
 _Johan Lundström - jl226ki_
 
@@ -13,6 +14,46 @@ A simple (perhaps even crude) Raspberry Pi Pico setup (in MicroPython) for sort 
 - Here is video of the system running and the three different sensors being active for a short time and the system signaling this by flashing the different LEDs.
 
 https://github.com/lundstrj/mailbox/assets/1045735/d2899a08-660c-4be2-924c-64ea70c737d7
+
+<!-- TOC -->
+* [Mailbox](#mailbox)
+  * [TL;DR](#tldr)
+  * [Overview](#overview)
+    * [The problem](#the-problem)
+    * [The solution](#the-solution)
+    * [Time to complete](#time-to-complete)
+    * [What different blinking (and buzzing) patterns mean](#what-different-blinking-and-buzzing-patterns-mean)
+  * [Objective](#objective)
+    * [Why?](#why)
+    * [Purpose](#purpose)
+    * [Insights](#insights)
+  * [Bill of materials](#bill-of-materials)
+  * [Assembly instructions](#assembly-instructions)
+    * [Computer setup](#computer-setup)
+      * [My setup](#my-setup)
+      * [High level step-by-step instructions on how to set up a Pico like I did](#high-level-step-by-step-instructions-on-how-to-set-up-a-pico-like-i-did)
+    * [Bare-bones wiring setup](#bare-bones-wiring-setup)
+    * [Full fat breadboard wiring setup](#full-fat-breadboard-wiring-setup)
+    * [Assembly and sticking it in an actual mailbox](#assembly-and-sticking-it-in-an-actual-mailbox)
+    * [Power draw, expected and actual (and adventures in power management)](#power-draw-expected-and-actual-and-adventures-in-power-management)
+  * [Platform](#platform)
+    * [High level diagram of the system](#high-level-diagram-of-the-system)
+    * [Elaboration](#elaboration)
+    * [Scaling](#scaling)
+  * [Code](#code)
+    * [Initialization / setup](#initialization--setup)
+    * [Loading a yaml file in micro python](#loading-a-yaml-file-in-micro-python)
+    * [Main loop](#main-loop)
+    * [Determining if mail has been delivered in the last x samples](#determining-if-mail-has-been-delivered-in-the-last-x-samples)
+    * [Handling flaky wifi on the Pico](#handling-flaky-wifi-on-the-pico)
+    * [Testing](#testing)
+      * [What has been done](#what-has-been-done)
+      * [What has NOT been done](#what-has-not-been-done)
+      * [What could have (reasonably) been done](#what-could-have-reasonably-been-done)
+  * [Connectivity and Data visualization](#connectivity-and-data-visualization)
+  * [Data security/sensitivity considerations](#data-securitysensitivity-considerations)
+  * [In the end](#in-the-end)
+<!-- TOC -->
 
 ## Overview
 ### The problem
