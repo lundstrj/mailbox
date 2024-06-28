@@ -152,7 +152,7 @@ while True:
 - Flash `main.py` to the Pico
 - IF you want to use the Home Assistant integration, you will need to [set up Home Assistant](https://www.home-assistant.io/installation/) (you don't need to have it)
 - IF you want to use the push notificaiton feature through [ntfy.sh](https://ntfy.sh/) then you'll need to set that up too (you don't need to have it)
-- The Pico should reset automatically and start right up. It will keep trying to connect to Wifi until it succeeds. If it managed to connect to WiFi it will go into mail monitoring mode
+- The Pico should reset automatically and start right up. It will keep trying to connect to Wifi until it succeeds. If it managed to connect to WiFi it will go into mail monitoring mode (which is indicated by the on board LED fashing about once per second)
 
 ### Bare-bones wiring setup
 _I am sure you won't have any issues, you don't need any of those flashy LEDs ;-)_
