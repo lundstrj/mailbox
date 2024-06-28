@@ -68,7 +68,7 @@ Get a microcontroller and some sensors and hook them up to your mailbox. This wa
 
 ### Time to complete
 __2 hours__<br>
-If you have my code, all the hardware and a mailbox and know how to flash code onto a Pico (or possess the ability to follow one of the many many online tutorials and guides) you can probably get this done in an hour or two.
+If you have my code, all the hardware and a mailbox and know how to flash code onto a Pico (or possess the ability to follow one of the many many [online tutorials and guides](https://www.raspberrypi.com/documentation/microcontrollers/micropython.html#:~:text=Push%20and%20hold%20the%20BOOTSEL,Your%20Pico%20will%20reboot.)) you can probably get this done in an hour or two.
 
 _(it took me significantly longer, but I was also prototyping and testing a lot of things along the way)_
 
