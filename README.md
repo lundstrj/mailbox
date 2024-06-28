@@ -111,21 +111,21 @@ Basically you need a microcontroller and a couple of buttons. I used a Raspberry
 I used a Pico WH on a breadboard to prototype this. I also added LEDs and a buzzer to help me see the state without hooking up a debugger. You can do that too if you want to, or just skip all of that and wire up the bare bones setup in that section :point_down:
 
 ### Computer setup
-I am not going to go very deep into this, it is instead left mostly as an exercise for the reader. Many guides exist on how to set up a Raspberry Pi Pico, and I am sure you can find one that suits your needs.
-You will need some sort of computer to write the code on. You will need something with a USB port so that you can flash the Pico with your code. You will need some sort of tool which can flash the Pico with your code.
+I am not going to go very deep into this, it is instead left mostly as an exercise for the reader. Many guides exist on how to set up a Raspberry Pi Pico, and I am sure you can find one that [suits your needs](https://www.raspberrypi.com/documentation/microcontrollers/micropython.html#:~:text=Push%20and%20hold%20the%20BOOTSEL,Your%20Pico%20will%20reboot.).
+You will need some sort of computer to write the code on. You will need something with a USB port so that you can flash the Pico with your code. You will need some sort of tool which can flash the Pico with your code (beginners might want to start with [Thonny](https://thonny.org/), some people go with [VSCode](https://code.visualstudio.com/), I went with [PyCharm](https://www.jetbrains.com/pycharm/). Dealers choice really).
 
 #### My setup
-- development system: A MacBook Pro
-- IDE: JetBrains PyCharm (community edition)
-- IDE-plugin: Jetbrains MicroPython plugin
+- development system: A MacBook Pro (it really doens't matter, any computer built in the past 15 years will likely do just fine)
+- IDE: [JetBrains PyCharm](https://www.jetbrains.com/pycharm/) (community edition)
+- IDE-plugin: Jetbrains [MicroPython plugin](https://plugins.jetbrains.com/plugin/9777-micropython)
 - Tool for initial Pico setup: Thonny (just for adding the MicroPython firmware to the Pico and then not touched again)
 
 #### High level step-by-step instructions on how to set up a Pico like I did
-- Install Thonny _(I do not recommend pip for this as it resulted in SSL errors for me)_
+- Install [Thonny](https://thonny.org/) _(I do not recommend pip for this as it resulted in SSL errors for me)_
 - Connect the Pico to your computer via USB
 - Use Thonny to add the MicroPython firmware to the Pico
-- Install PyCharm
-- Install the MicroPython plugin for PyCharm
+- Install [PyCharm](https://www.jetbrains.com/pycharm/)
+- Install the [MicroPython plugin for PyCharm](https://plugins.jetbrains.com/plugin/9777-micropython)
 - Write some code in PyCharm :point_down: into a file called `main.py`
 ```python
 import machine
@@ -139,9 +139,18 @@ while True:
     led_w.toggle()
     utime.sleep(1)
 ```
-- use PyCharm to flash `main.py` to the Pico (this will also run your code on the Pico)
+- use PyCharm to flash `main.py` to the Pico (this will also run your code on the Pico) ![flash_button](https://github.com/lundstrj/mailbox/assets/1045735/28eb007a-5119-4f5b-b165-fb8b1a297b99)
+
 - Enjoy the little on-board LED blinking
-- If you got flashing lights :point_up: then you are now ready to start working on the mailbox project
+- If you got flashing lights :point_up: then you are now ready to start setting up Mailbox
+
+#### High level step-by-step instructions for setting up Mailbox on an already prepared Pico
+- Open and edit `settings.yaml` to reflect your setup (set credentials, tell Mailbox which pins have what connected to them)
+- Flash `settings.yaml` to the Pico
+- Flash `main.py` to the Pico
+- IF you want to use the Home Assistant integration, you will need to [set up Home Assistant](https://www.home-assistant.io/installation/) (you don't need to have it)
+- IF you want to use the push notificaiton feature through [ntfy.sh](https://ntfy.sh/) then you'll need to set that up too (you don't need to have it)
+- The Pico should reset automatically and start right up. It will keep trying to connect to Wifi until it succeeds. If it managed to connect to WiFi it will go into mail monitoring mode
 
 ### Bare-bones wiring setup
 _I am sure you won't have any issues, you don't need any of those flashy LEDs ;-)_
@@ -150,6 +159,10 @@ _I am sure you won't have any issues, you don't need any of those flashy LEDs ;-
 
 ### Full fat breadboard wiring setup
 ![](media/full_fat_bb.png)
+
+### Actuan circuit diagram
+This has been omitted since the diagrams ☝️ offer more than enough clarity for how to wire up this very basic system.
+It really isn't important which LEDs you use, as long as they are ballpark OK for 3.3-ish Volts we can get from the Pico.
 
 ### Assembly and sticking it in an actual mailbox
 __TODO: Stick it all into an actual mailbox__
