@@ -13,6 +13,8 @@ A simple (perhaps even crude) Raspberry Pi Pico setup (in MicroPython) for sort 
 - I have put some effort into making the code (`main.py`) somewhat robust and easy to configure for different setups (`settings.yaml` file)
 - Here is video of the system running and the three different sensors being active for a short time and the system signaling this by flashing the different LEDs.
 
+_Please enjoy this video of the different sensors being triggered briefly, and then finally a mail delivery event being triggered (by activating a sensor for long enough)_
+
 https://github.com/lundstrj/mailbox/assets/1045735/d2899a08-660c-4be2-924c-64ea70c737d7
 
 <!-- TOC -->
