@@ -183,32 +183,32 @@ Attempting to measure the power draw at the source (at the power supply or the w
 
 ## Platform
 I went with a Raspberry Pi Pico WH running MicroPython since I have previous experience with Python and the tooling around Raspberry devices is usually quite nice to work with.
-In addition to the hardware I also use a Home Assistant server (not that it matters but it runs on Raspberry Pi4) to visualize the data from the mailbox.
-I also use ntfy.sh to send notifications to my phone when mail has been delivered.
+In addition to the hardware I also use a [Home Assistant server](https://www.home-assistant.io/installation/) (not that it matters but it runs on Raspberry Pi4) to visualize the data from the mailbox.
+I also use [ntfy.sh](https://ntfy.sh/) to send notifications to my phone when mail has been delivered.
 
 This is local first setup (with the option to pay for Home Assistant Cloud in the future if I should want to).
-In order to still get notifications on my phone I have set up a little companion app which subscribes to topic the Pico can post to. I went with https://ntfy.sh/ for this.
+In order to still get notifications on my phone I have set up a little companion app which subscribes to topic the Pico can post to. I went with [https://ntfy.sh/](https://ntfy.sh/) for this.
 
 ### High level diagram of the system
 ![](media/mailbox_diagram.png)
 
 ### Elaboration
-I consider cloud functionality to be an unnecessary attack vector and an inconvenience for most of my use cases. Sure, it might be occasionally nice to have, but I prefer to keep things local and under my control.
+I consider cloud functionality to be an unnecessary attack vector and an inconvenience for most of my use cases. Sure, it might be occasionally nice to have, but I prefer to keep things local and under my control (also without any unnecessary running costs).
 This preference and the truly outstanding tooling around Raspberry Pi devices is why I went with Home Assistant on a Raspberry Pi (instead of some cloud service).
 
 I chose a MacBook Pro for my development environment simply because I have one. Without the MBP I would have used a Linux machine with all the same tooling.
 Also, we are in Småland so why pay for things unless you need to?
 
-(it makes sense to pay for a service such a GCP or AWS for when you don't want to or cant host your own metal. Using a cloud service to see the temperature in the room you are in is almost perverse)
+(it makes sense to pay for a service such a GCP or AWS for when you don't want to or cant host your own metal. Using a cloud service to see the temperature in the room you are in, of if there is mail in the metal box 20 meters away from your house is almost perverse)
 
 ### Scaling
 This little hobby project is not designed with scaling in mind. A Pico is gross overkill for what this project does. The physical nature of the project also doesn't scale well as it currently needs custom installation to meet the specific mailbox the user happens to have.
-HOWEVER, the software aspects of this project are fairly well suited for scale. The system is very quiet on the network, only sending about 3 request per day so any server setup to receive the data would be able to handle a large number of mailboxes.
-The selected push notification service (ntfy.sh) is also well suited for scale as it has paid service and should be able to handle a large number of notifications. It is also open enough to allow you to host your very own ntfy server which you can scale to your heart's delight.
+HOWEVER, the software aspects of this project are fairly well suited for scale. The system is very quiet on the network, only sending about 4 request per day so any server setup to receive the data would be able to handle a large number of mailboxes.
+The selected push notification service (ntfy.sh) is also well suited for scale as it has a paid service tier and should be able to handle a large number of notifications (even at a pretty low monthly cost). It is also open enough to allow you to host your very own ntfy server which you can scale to your heart's delight.
 
 ## Code
-The code can be found in this repo, you want the `main.py` file. Stick that on a Pico W (or WH) and watch it go.
-I have taken some care to handle different setups from my own (you don't need all of my sensors, the buzzer nor the LEDs). You can also configure the pins to match your setup by editing the `settings.yaml` file.
+The code can be found in this repo, you want the `main.py` file. Stick that (and `settings.py`) on a Pico W (or WH) and watch it go.
+I have taken some care to handle setups wich are different from my own (you don't need all of my sensors, the buzzer, nor the LEDs). You can also configure the pins to match your setup by editing the `settings.yaml` file.
 
 The code is split into two main parts:
 1. initialization / setup
@@ -255,20 +255,18 @@ settings: dict = load_settings(settings_file_name)
 ```
 
 ### Main loop
-The main loop continuously samples the attached sensors and checks if the past x samples can be considered a mail delivery or not. <br>
+The main loop continuously samples (the frequence can be configured in `settings.yaml`) the attached sensors and checks if the past x samples (this can be configured in `settings.yaml`) can be considered a mail delivery or not. <br>
 If a mail delivery is detected, the Pico will send a message to the Home Assistant server, ping the ntfy.sh service and blink the onboard LED and buzz the buzzer (assuming there is one connected)
-The system will then enter a sleep mode for a set amount of time before starting the main loop again (this is to save power) the next day.
+The system will then enter a sleep mode for a set amount of time before starting the main loop again (this is to save power) when the user resets the mailbox (by holding the reset button for up to 10 seconds).
 
 Since mail presence in the mailbox is a binary state, it makes little sense to continue to monitor the mailbox after a mail delivery has been detected.
-If the user would like to wake the mailbox up early, there is also a reset button connected to the Pico which will wake it up from sleep and trigger a restart of the device.
 
 ### Determining if mail has been delivered in the last x samples
 Since the main loop isn't very interesting on it's own, here is the logic for determining if mail has been delivered in the last x samples.
 ```python
 def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
     """
-        {'counter': counter,
-        'lid_open': lid_open,
+        {'lid_open': lid_open,
         'bottom_sensor_active': bottom_sensor_active,
         'tilt_sensor_active': tilt_sensor_active}
     """
@@ -341,7 +339,7 @@ def connect() -> network.WLAN:
 - I have tested each individual sensor standalone to ensure that they work as expected (before assembly)
 - The WiFi connection, the Home Assistant connection and the ntfy.sh connection has also been tested in isolation and have simple error handling for common problems.
 - There are some basic preflight checks before the main loop starts to ensure that the system is in a good state before starting the main loop.
-- The classes imported from the Machine library have been mocked in mock.py which allows tests to be carried out on the logic separately from the hardware.  
+- The classes imported from the Machine library have been mocked in mock.py which allows tests to be carried out on the logic separately from the hardware.
 
 #### What has NOT been done
 There is little to no error handling for hardware malfunctions at run time (say one sensor out of 3 starts misbehaving, there is currently no logic to handle that)
@@ -352,18 +350,18 @@ Automated testing in a CI/CD pipeline would have been nice to have. I have not s
 ## Connectivity and Data visualization
 Mailbox is equipped with logic to send data to a Home Assistant server, which can then be used to visualize the data in a pretty straight forward way.<br><br>
 Data is, on average, sent to Home Assistant 2 times per day IF mail is delivered that day. On average this results in about 12 request per week (one request to tell Home Assistant there is mail in the mailbox, one request to for when the system is reset, one request to tell Ntfy to notify the subscribers and one request to Ntfy for when the mailbox has been reset)
-This current setup is relying on WiFi for all data communication (but the full fat setup also has lights and a buzzer to communicate with the user)
+This current setup is relying on WiFi for all data communication (but the full fat setup also has lights and a buzzer to communicate with the user).
 
 Bog-standard HTTP requests are used to send data to Home Assistant and to NTFY. The request frequency and data amount is so low that it is not worth optimizing for this project in its current scope.
 If anything, WiFi is gross overkill for the data transfer needs (it is also probably the biggest power drain of this system) of this project BUT it had the one main advantage of being an already available network on site and being easy to work with. WiFi was used due to convenience, not because it is the best tool for the job.
 Given my bandwidth and range needs, I'd argue that Zigbee would be a better choice. LoRa would be overkill in terms of range and would also incur a higher cost for the hardware and operating costs (but would be nice from a power draw point of view). LTE offers loads of bandwidth (which I don't need) and would also add costs for the hardware and running.
-Low Energy Bluetooth would also be a good choice, provided the mailbox is in range of the Home Assistant. (This would also require reworking the data gets sent from the Pico to the Home Assistant server and Ntfy. A good technological choice nonetheless)
+Low Energy Bluetooth would have be a good alternative, provided the mailbox is in range of the Home Assistant. (This would also require reworking how the data gets sent from the Pico to the Home Assistant server and Ntfy. A good technological choice nonetheless)
 
 The main reason to go with Home Assistant as my "database" and visualization solution is much like the decision to go with Wifi, out of convenience.
 I already had a Home Assistant setup. It has built in functionality for doing what I need out of this mailbox system. It could be argued that going with Grafana would have been a better choice for visualization, but with binary output, from only one source, which changes at most twice per day, I don't see the need for a more advanced visualization tool.
 There is currently no automation setup which is using the input from this mailbox system. Since mail (currently) needs to be fetched manually, I just didn't see a need to go beyond dashboard and push notifications.
 
-Getting push notifications:
+Please enjoy this video of a phone getting push notifications:
 
 https://github.com/lundstrj/mailbox/assets/1045735/c4a27314-9a62-4c77-ac87-b9dbb52fd659
 
