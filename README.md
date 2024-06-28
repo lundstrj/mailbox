@@ -365,7 +365,7 @@ The main reason to go with Home Assistant as my "database" and visualization sol
 I already had a Home Assistant setup. It has built in functionality for doing what I need out of this mailbox system. It could be argued that going with Grafana would have been a better choice for visualization, but with binary output, from only one source, which changes at most twice per day, I don't see the need for a more advanced visualization tool.
 There is currently no automation setup which is using the input from this mailbox system. Since mail (currently) needs to be fetched manually, I just didn't see a need to go beyond dashboard and push notifications. 
 
-Please enjoy this video of a phone getting push notifications:
+_Please enjoy this video of a phone getting push notifications_
 
 https://github.com/lundstrj/mailbox/assets/1045735/c4a27314-9a62-4c77-ac87-b9dbb52fd659
 
