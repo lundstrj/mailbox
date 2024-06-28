@@ -220,6 +220,8 @@ The code is split into two main parts:
 This part of the code is responsible for setting up the Pico and the sensors. It also reads the settings from the `settings.yaml` file and sets up the pins accordingly.
 It also connects to wifi, pings external services (such as Home Assistant) and tries to reach the public internet to see which features can be used.
 
+_Please enjoy this video of Mailbox being powered on and going through two attempts to initiate before finally succeeding with connect to WiFi._
+
 https://github.com/lundstrj/mailbox/assets/1045735/3aaea723-b65c-47a8-b1be-75d47a6f56f5
 
 ### Loading a yaml file in micro python
