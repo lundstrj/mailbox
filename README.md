@@ -95,19 +95,19 @@ The main insight is the binary state of mail present in my mailbox, or not. With
 ## Bill of materials
 Basically you need a microcontroller and a couple of buttons. I used a Raspberry Pi Pico W and some push buttons and a tilt sensor (mainly to be fancy). You can get away with only one push button if you'd like, but I will be using the following:
 
-| Component image                           | Component name           | Quantity | Price    |  Product link |
-|-------------------------------------------|--------------------------|----------|----------|---|
-| ![](/media/pico.jpeg)                     | Raspberry Pi Pico W      | 1        | 109 SEK  |  https://www.electrokit.com/raspberry-pi-pico-wh |
-| ![](/media/bread_board.jpeg)              | Breadboard               | 1        | 69 SEK   |  https://www.electrokit.com/kopplingsdack-840-anslutningar |
-| ![](/media/push_button.jpeg)              | Push button              | 3        | 16.5 SEK |  https://www.electrokit.com/tryckknapp-1-pol-off-onmetall-gron-lodoron |
-| ![](/media/tilt_switch.jpeg)              | Tilt switch/sensor       | 1        | 15 SEK   |  https://www.electrokit.com/tiltswitch-5vdc-vertikal |
-| ![](/media/jumper_wires.jpeg)             | male-male jumper wires   | 1        | 39 SEK   | https://www.electrokit.com/kopplingstrad-byglar-for-kopplingsdack-mjuka-65st |
-| ![](/media/jumper_wires_male_female.jpeg) | male-female jumper wires | 1        | 29 SEK   | https://www.electrokit.com/labsladd-1-pin-hane-hona-150mm-10-pack |
-| ![](/media/green_led.jpeg)                | Green LED                | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-gron-inbyggt-motstand-5v |
-| ![](/media/yellow_led.jpeg)               | Yellow LED               | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-gul-inbyggt-motstand-5v |
-| ![](/media/red_led.jpeg)                  | Red LED                  | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-rod-inbyggt-motstand-5v |
-| ![](/media/mailbox.jpeg)                  | Mailbox                  | 1        | 299 SEK  | https://www.biltema.se/fritid/tradgard/entre/brevlador/brevlada-med-las-vit-2000053657 |
-| ![](/media/buzzer.jpeg)                   | Buzzer                   | 1        | 39 SEK   | https://www.electrokit.com/piezohogtalare-aktiv |
+| Component image                           | Component name           | Purpose                                                                                                                                                          | Quantity | Price    |  Product link |
+|-------------------------------------------|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|----------|---|
+| ![](/media/pico.jpeg)                     | Raspberry Pi Pico W      | This is our [microcontroller](https://en.wikipedia.org/wiki/Microcontroller)                                                                                     | 1        | 109 SEK  |  https://www.electrokit.com/raspberry-pi-pico-wh |
+| ![](/media/bread_board.jpeg)              | Breadboard               | [Breadboards](https://en.wikipedia.org/wiki/Breadboard) are used for prototyping curcuits                                                                        | 1        | 69 SEK   |  https://www.electrokit.com/kopplingsdack-840-anslutningar |
+| ![](/media/push_button.jpeg)              | Push button              | A [button](https://en.wikipedia.org/wiki/Push-button) is a button is a button                                                                                                                                 | 3        | 16.5 SEK |  https://www.electrokit.com/tryckknapp-1-pol-off-onmetall-gron-lodoron |
+| ![](/media/tilt_switch.jpeg)              | Tilt switch/sensor       | A [tilt switch](https://www.e-switch.com/blog/what-are-tilt-switches-used-for/) is a bit like a button but you tolt it instead of pressing it                                                                                      | 1        | 15 SEK   |  https://www.electrokit.com/tiltswitch-5vdc-vertikal |
+| ![](/media/jumper_wires.jpeg)             | male-male jumper wires   | This is a [neat little insulated wire](https://en.wikipedia.org/wiki/Jump_wire) which fits neatly on a breadboard.                                               | 1        | 39 SEK   | https://www.electrokit.com/kopplingstrad-byglar-for-kopplingsdack-mjuka-65st |
+| ![](/media/jumper_wires_male_female.jpeg) | male-female jumper wires | This too is a [neat little insulated wire](https://en.wikipedia.org/wiki/Jump_wire) which fits neatly on a breadboard, only it has a female connector in one end | 1        | 29 SEK   | https://www.electrokit.com/labsladd-1-pin-hane-hona-150mm-10-pack |
+| ![](/media/green_led.jpeg)                | Green LED                | These [little suckers](https://en.wikipedia.org/wiki/Light-emitting_diode) can light up in pretty colors, like green.                                            | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-gron-inbyggt-motstand-5v |
+| ![](/media/yellow_led.jpeg)               | Yellow LED               | These [little suckers](https://en.wikipedia.org/wiki/Light-emitting_diode) can light up in pretty colors, like yellow.                                           | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-gul-inbyggt-motstand-5v |
+| ![](/media/red_led.jpeg)                  | Red LED                  | These [little suckers](https://en.wikipedia.org/wiki/Light-emitting_diode) can light up in pretty colors, like red.                                              | 1        | 8 SEK    | https://www.electrokit.com/led-5mm-rod-inbyggt-motstand-5v |
+| ![](/media/mailbox.jpeg)                  | Mailbox                  | The [pièce de résistance](https://en.wiktionary.org/wiki/pi%C3%A8ce_de_r%C3%A9sistance), a mailbox.                                                              | 1        | 299 SEK  | https://www.biltema.se/fritid/tradgard/entre/brevlador/brevlada-med-las-vit-2000053657 |
+| ![](/media/buzzer.jpeg)                   | Buzzer                   | This little guy goes [bzzzzz](https://en.wikipedia.org/wiki/Buzzer) when current is applied                                                                      | 1        | 39 SEK   | https://www.electrokit.com/piezohogtalare-aktiv |
 
 ## Assembly instructions
 I used a Pico WH on a breadboard to prototype this. I also added LEDs and a buzzer to help me see the state without hooking up a debugger. You can do that too if you want to, or just skip all of that and wire up the bare bones setup in that section :point_down:
@@ -123,9 +123,10 @@ You will need some sort of computer to write the code on. You will need somethin
 - Tool for initial Pico setup: Thonny (just for adding the MicroPython firmware to the Pico and then not touched again)
 
 #### High level step-by-step instructions on how to set up a Pico like I did
+- (technically you don't need [Python](https://www.python.org/downloads/) on your computer for thus, but it is so nice to have so why not install it anyway? I use [brew](https://brew.sh/) to install Python on Macs, but you can use the installer from the Python website too)
 - Install [Thonny](https://thonny.org/) _(I do not recommend pip for this as it resulted in SSL errors for me)_
 - Connect the Pico to your computer via USB
-- Use Thonny to add the MicroPython firmware to the Pico
+- Use Thonny to add the MicroPython firmware to the Pico (you can also flash micropython onto the Pico "manually" by [dragging and dropping the firmware](https://www.raspberrypi.com/documentation/microcontrollers/micropython.html#drag-and-drop-micropython) file onto the Pico drive)
 - Install [PyCharm](https://www.jetbrains.com/pycharm/)
 - Install the [MicroPython plugin for PyCharm](https://plugins.jetbrains.com/plugin/9777-micropython)
 - Write some code in PyCharm :point_down: into a file called `main.py`
@@ -151,8 +152,8 @@ while True:
 - Flash `settings.yaml` to the Pico
 - Flash `main.py` to the Pico
 - IF you want to use the Home Assistant integration, you will need to [set up Home Assistant](https://www.home-assistant.io/installation/) (you don't need to have it)
-- IF you want to use the push notificaiton feature through [ntfy.sh](https://ntfy.sh/) then you'll need to set that up too (you don't need to have it)
-- The Pico should reset automatically and start right up. It will keep trying to connect to Wifi until it succeeds. If it managed to connect to WiFi it will go into mail monitoring mode (which is indicated by the on board LED fashing about once per second)
+- IF you want to use the push notification feature through [ntfy.sh](https://ntfy.sh/) then you'll need to set that up too (you don't need to have it)
+- The Pico should reset automatically and start right up. It will keep trying to connect to WiFi until it succeeds. If it managed to connect to WiFi it will go into mail monitoring mode (which is indicated by the on board LED fashing about once per second)
 
 ### Bare-bones wiring setup
 _I am sure you won't have any issues, you don't need any of those flashy LEDs ;-)_
@@ -162,7 +163,7 @@ _I am sure you won't have any issues, you don't need any of those flashy LEDs ;-
 ### Full fat breadboard wiring setup
 ![](media/full_fat_bb.png)
 
-### Actuan circuit diagram
+### Actual circuit diagram
 This has been omitted since the diagrams ☝️ offer more than enough clarity for how to wire up this very basic system.
 It really isn't important which LEDs you use, as long as they are ballpark OK for 3.3-ish Volts we can get from the Pico.
 
@@ -178,7 +179,7 @@ All the used sensors are passive and draw no power at all for the most part and 
 
 Using the Wifi to send request will draw more power than just idling, but again, this is done so rarely that it over time becomes negligible.
 
-(Mailbox could/should be redesigned to use pretty much no power at all by only switching on when the mailbox lid is lifted and then shutting down again after a few seconds. This would require a bit of extra hardware and a bit of extra code, but would be a good design choice for a battery powered mailbox system. It would also only switch on the radio and connect to Wifi, if and when mail has been detected. Mailbox is not designed to run on battery power as batteries tend to struggle in low temperatures and mailboxes have a tendency to be placed outside in the cold.)
+(Mailbox could/should be redesigned to use pretty much no power at all by only switching on when the mailbox lid is lifted and then shutting down again after a few seconds. This would require a bit of extra hardware and a bit of extra code, but would be a good design choice for a battery powered mailbox system. It would also only switch on the radio and connect to WiFi, if and when mail has been detected. Mailbox is not designed to run on battery power as batteries tend to struggle in low temperatures and mailboxes have a tendency to be placed outside in the cold.)
 
 Attempting to measure the power draw at the source (at the power supply or the wall plug) both resulted in measurements so low that it registers as 0W. The actual number is obviously higher than 0 as the device is indeed powered on but this still helps us gain some confidence in that hand-waving numbers mentioned :point_up: might be ballpark.
 
@@ -190,6 +191,12 @@ I also use [ntfy.sh](https://ntfy.sh/) to send notifications to my phone when ma
 
 This is local first setup (with the option to pay for Home Assistant Cloud in the future if I should want to).
 In order to still get notifications on my phone I have set up a little companion app which subscribes to topic the Pico can post to. I went with [https://ntfy.sh/](https://ntfy.sh/) for this.
+
+### What the heck is this ntfy.sh thing I've been hearing so much about lately?
+[Ntfy](https://ntfy.sh/) is a service made specifically to make it easy to trigger and receive notifications. It is a simple service which allows you to send a POST request to a specific URL and then have that request be forwarded to all subscribers of that topic. It is a simple and effective way to get notifications to your phone without having to set up a full-blown push notification service. It is also open enough that you can host your very own ntfy server if you'd like to. It comes with a neat little companion app you can install on your phone to receive the notifications.
+
+### Home Assistant?
+[Home Assistant](https://www.home-assistant.io/) is a neat little open project aimed at making it just a smidge easier to automate and measure things in your home. It is super easy to set up on a Raspberry Pi (you can also run it on other hardware if you'd like to) and it has a lot of pre-made integrations with other services and devices. If you are even just a little bit curios, spend those 30 minutes it takes to get it working.
 
 ### High level diagram of the system
 ![](media/mailbox_diagram.png)
@@ -210,7 +217,9 @@ The selected push notification service (ntfy.sh) is also well suited for scale a
 
 ## Code
 The code can be found in this repo, you want the `main.py` file. Stick that (and `settings.py`) on a Pico W (or WH) and watch it go.
-I have taken some care to handle setups wich are different from my own (you don't need all of my sensors, the buzzer, nor the LEDs). You can also configure the pins to match your setup by editing the `settings.yaml` file.
+I have taken some care to handle setups which are different from my own (you don't need all of my sensors, the buzzer, nor the LEDs). You can also configure the pins to match your setup by editing the `settings.yaml` file.
+
+_This code base is currently rather light on the comments, but it is only a few hundred lines of code and most of it is pretty clearly labeled_
 
 The code is split into two main parts:
 1. initialization / setup
@@ -259,14 +268,14 @@ settings: dict = load_settings(settings_file_name)
 ```
 
 ### Main loop
-The main loop continuously samples (the frequence can be configured in `settings.yaml`) the attached sensors and checks if the past x samples (this can be configured in `settings.yaml`) can be considered a mail delivery or not. <br>
+The main loop continuously samples (the frequency can be configured in `settings.yaml`) the attached sensors and checks if the past x samples (this can be configured in `settings.yaml`) can be considered a mail delivery or not. <br>
 If a mail delivery is detected, the Pico will send a message to the Home Assistant server, ping the ntfy.sh service and blink the onboard LED and buzz the buzzer (assuming there is one connected)
 The system will then enter a sleep mode for a set amount of time before starting the main loop again (this is to save power) when the user resets the mailbox (by holding the reset button for up to 10 seconds).
 
 Since mail presence in the mailbox is a binary state, it makes little sense to continue to monitor the mailbox after a mail delivery has been detected.
 
 ### Determining if mail has been delivered in the last x samples
-Since the main loop isn't very interesting on it's own, here is the logic for determining if mail has been delivered in the last x samples.
+Since the main loop isn't very interesting on its own, here is the logic for determining if mail has been delivered in the last x samples.
 ```python
 def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
     """
@@ -307,7 +316,7 @@ def check_if_mail_has_been_delivered(list_of_samples: list) -> bool:
 ```
 
 ### Handling flaky wifi on the Pico
-The Pico can be a bit flaky when it comes to connecting to wifi. I have added a simple retry mechanism to try to connect to wifi a few times before giving up and restarting the device.
+The Pico can be a bit flaky when it comes to connecting to WiFi. I have added a simple retry mechanism to try to connect to WiFi a few times before giving up and restarting the device.
 ```python
 def connect() -> network.WLAN:
     print(f"Connecting to WiFi: {ssid}")
@@ -356,10 +365,10 @@ Mailbox is equipped with logic to send data to a Home Assistant server, which ca
 Data is, on average, sent to Home Assistant 2 times per day IF mail is delivered that day. On average this results in about 12 request per week (one request to tell Home Assistant there is mail in the mailbox, one request to for when the system is reset, one request to tell Ntfy to notify the subscribers and one request to Ntfy for when the mailbox has been reset)
 This current setup is relying on WiFi for all data communication (but the full fat setup also has lights and a buzzer to communicate with the user).
 
-Bog-standard HTTP requests are used to send data to Home Assistant and to NTFY. The request frequency and data amount is so low that it is not worth optimizing for this project in its current scope.
+Bog-standard [HTTP](https://en.wikipedia.org/wiki/HTTP) requests are used to send data to Home Assistant and to NTFY. The request frequency and data amount is so low that it is not worth optimizing for this project in its current scope.
 If anything, WiFi is gross overkill for the data transfer needs (it is also probably the biggest power drain of this system) of this project BUT it had the one main advantage of being an already available network on site and being easy to work with. WiFi was used due to convenience, not because it is the best tool for the job.
-Given my bandwidth and range needs, I'd argue that Zigbee would be a better choice. LoRa would be overkill in terms of range and would also incur a higher cost for the hardware and operating costs (but would be nice from a power draw point of view). LTE offers loads of bandwidth (which I don't need) and would also add costs for the hardware and running.
-Low Energy Bluetooth would have be a good alternative, provided the mailbox is in range of the Home Assistant. (This would also require reworking how the data gets sent from the Pico to the Home Assistant server and Ntfy. A good technological choice nonetheless)
+Given my bandwidth and range needs, I'd argue that [Zigbee](https://en.wikipedia.org/wiki/Zigbee) would be a better choice. LoRa would be overkill in terms of range and would also incur a higher cost for the hardware and operating costs (but would be nice from a power draw point of view). LTE offers loads of bandwidth (which I don't need) and would also add costs for the hardware and running.
+Low Energy Bluetooth would have been a good alternative, provided the mailbox is in range of the Home Assistant. (This would also require reworking how the data gets sent from the Pico to the Home Assistant server and Ntfy. A good technological choice nonetheless)
 
 The main reason to go with Home Assistant as my "database" and visualization solution is much like the decision to go with Wifi, out of convenience.
 I already had a Home Assistant setup. It has built in functionality for doing what I need out of this mailbox system. It could be argued that going with Grafana would have been a better choice for visualization, but with binary output, from only one source, which changes at most twice per day, I don't see the need for a more advanced visualization tool.
@@ -376,10 +385,10 @@ What things look like in Home Assistant<br>
 
 ## Data security/sensitivity considerations
 The data transmitted by Mailbox is a binary mail or no mail state. It lacks any [PII](https://en.wikipedia.org/wiki/Personal_data) and is not sensitive in any way.
-The Ntfy topic is wide open, anyone can subscribe to it if they'd like to. This could, in theory, be used to plan mail theft from me, by waiting near by and then springing to action when the mail delivery event is fired (I can also twart this by coming up with a more difficult to guess ntfy topic, or by paying for ntfy and adding authenticaton to my requests).
-However, the mail delivery schedule is public and it would be about as easy to just wait nearby for when the mail truck goes by. Since my mailbox is basically just a box with a lid, which anyone can open 👽, I figured I'm not really making things much worse by adding this mailbox notification system to it. If anything, I am reducing the on site attack vector time window by probably getting my mail sooner than I would otherwise.
+The Ntfy topic is wide open, anyone can subscribe to it if they'd like to. This could, in theory, be used to plan mail theft from me, by waiting nearby and then springing to action when the mail delivery event is fired (I can also thwart this by coming up with a more difficult to guess ntfy topic, or by paying for ntfy and adding authentication to my requests).
+However, the mail delivery schedule is public, and it would be about as easy to just wait nearby for when the mail truck goes by. Since my mailbox is basically just a box with a lid, which anyone can open 👽, I figured I'm not really making things much worse by adding this mailbox notification system to it. If anything, I am reducing the on site attack vector time window by probably getting my mail sooner than I would otherwise.
 
-Data retention in Home Assistant defaults to 10 days of historical data but this can also be user configured to anywere between not saving anything at all and storing things forever. Since the data generated by Mailbox is so tiny in both size and frequence, I could, if I wanted, store years and years worth of mail delivery data. However, in practice, I suspect I will rarely have a need for more than the default 10 days (heck, I probably don't need more than a couple of days). This is really more of a "because I can" sort of thing. The push notifications to my phone are likely more useful than the Home Assistant visualisation.
+Data retention in Home Assistant defaults to 10 days of historical data but this can also be user configured to anywhere between not saving anything at all and storing things forever. Since the data generated by Mailbox is so tiny in both size and frequency, I could, if I wanted, store years and years worth of mail delivery data. However, in practice, I suspect I will rarely have a need for more than the default 10 days (heck, I probably don't need more than a couple of days). This is really more of a "because I can" sort of thing. The push notifications to my phone are likely more useful than the Home Assistant visualisation.
 
 ## In the end
 _Instead of hiding pictures and videos down here, I have chosen to sprinkle them throughout the readme ☝️_<br>
@@ -390,16 +399,19 @@ There are about a thousand things I could have done differently and better.
 Mainly power draw is something I'd be keen to improve. Consider the following:
 
 - With working power modes on a Pico, I would be able to sleep for most of the time (not much mail being delivered at night().
-- Having the radio on all of the time really isn't needed. It could be turned on for a few seconds only when requests need to go out. This would add a slight delay since wifi would need to power up and connect before any notifications can go out, but I'd say it would still be a better design choice.
+- Having the radio on all the time really isn't needed. It could be turned on for a few seconds only when requests need to go out. This would add a slight delay since wifi would need to power up and connect before any notifications can go out, but I'd say it would still be a better design choice.
 - With a simple circuit, the Pico could actually be powered on only when the mailbox lid has been lifted (this drawing no power at all until it is needed) and then staying on only until mail has been detected, at which point it would shut down again until the next time the lid is lifted.
-- Since the Pico is a dual core microcontroller, I could also have one core running the main loop and the other core handling the wifi connection and message sending. This would allow me to have purer logic (as the current implementation can in practice miss mail delivery samples if it is in the middle of flashing ligths or buzzing a buzzer since only one thread is used and execution is strictly sequential)
+- Since the Pico is a dual-core microcontroller, I could also have one core running the main loop and the other core handling the wifi connection and message sending. This would allow me to have purer logic (as the current implementation can in practice miss mail delivery samples if it is in the middle of flashing lights or buzzing a buzzer since only one thread is used and execution is strictly sequential)
 - I could implement requests to a somewhat accessible PostNord API to determine if today is a PostNord delivery day or not. This could be displayed as a sensor in Home Assistant too.
-- I could add a little ultra sound sensor to detect if something is by the mailbox for x seconds (or longer) to try to figure out if the post car has been there or not (it would take at least a solid 5-10 seconds for a mailman to stop, deliver mail and do a burnout).
+- I could add a little ultrasound sensor to detect if something is by the mailbox for x seconds (or longer) to try to figure out if the post car has been there or not (it would take at least a solid 5-10 seconds for a mailman to stop, deliver mail and do a burnout).
 - I could add a little handy button for the mailman to press (if they feel like it) to explicitly trigger a mail delivery event.
+
+Furthermore:
+- The code is currently very light on comments and documentation. It is, however, only a few hundred lines of code and most of it is small helpers, so it won't take long to get familiar with it. Function and variable names have been selected to give a very good idea of what they do and are used for.
 
 Next up after that I reccon we'd be in image processing territory. But really, I 100% expect a system with just one button and an electric flip switch hooked up to a light (which would then stay on) to work just about as well as anything mentioned ☝️
 
-Overall, I am pleased with my setup and choice of tools. Home Assistant performed well and was a dream to setup. Ntfy.sh was also a breeze to setup and use. The Pico can be a bit flaky in terms of connecting to wifi but wasn't difficult to work around with a few lines of code. It did bother me a bit that the different power modes supported in MicroPython are not all implemented in the Raspberry Pico and using IRQs to wake the Pico up from lightsleep did not work as documented. The Pico is the Raspberry Foundation's first microconroller, and power draw and power modes are traditionally things that are hard to get right on the first try. ESP32/Arduino is much more mature and have also gotten further in these areas. Moving this over to Arduino and away from WiFi to Zigbee AND only powering on when the mailbox lid is lifted will likely let me run this thing on a couple of AA batteries for months (maybe years) without needing to swap batteries<br><br>
+Overall, I am pleased with my setup and choice of tools. Home Assistant performed well and was a dream to setup. Ntfy.sh was also a breeze to setup and use. The Pico can be a bit flaky in terms of connecting to WiFi but wasn't difficult to work around with a few lines of code. It did bother me a bit that the different power modes supported in MicroPython are not all implemented in the Raspberry Pico and using IRQs to wake the Pico up from lightsleep did not work as documented. The Pico is the Raspberry Foundation's first microcontroller, and power draw and power modes are traditionally things that are hard to get right on the first try. ESP32/Arduino is much more mature and have also gotten further in these areas. Moving this over to Arduino and away from WiFi to Zigbee AND only powering on when the mailbox lid is lifted will likely let me run this thing on a couple of AA batteries for months (maybe years) without needing to swap batteries<br><br>
 ![](/media/toast.png)![](/media/toast.png)![](/media/toast.png)![](/media/toast.png) 4 toast points out of 5, [Kanonkul](https://youtu.be/pYPjFpixTP8?t=57).
 
 _(not that anyone asked but I listened to a fair bit of Jack Parow's album [Eksie Ou](https://www.discogs.com/release/4207711-Jack-Parow-Eksie-Ou) during this project)_<br>
