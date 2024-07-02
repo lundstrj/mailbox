@@ -123,7 +123,7 @@ You will need some sort of computer to write the code on. You will need somethin
 - Tool for initial Pico setup: Thonny (just for adding the MicroPython firmware to the Pico and then not touched again)
 
 #### High level step-by-step instructions on how to set up a Pico like I did
-- (technically you don't need [Python](https://www.python.org/downloads/) on your computer for thus, but it is so nice to have so why not install it anyway? I use [brew](https://brew.sh/) to install Python on Macs, but you can use the installer from the Python website too)
+- (technically you don't need [Python](https://www.python.org/downloads/) on your computer for this, but it is so nice to have so why not install it anyway? I use [brew](https://brew.sh/) to install Python on Macs, but you can use the installer from the Python website too)
 - Install [Thonny](https://thonny.org/) _(I do not recommend pip for this as it resulted in SSL errors for me)_
 - Connect the Pico to your computer via USB
 - Use Thonny to add the MicroPython firmware to the Pico (you can also flash micropython onto the Pico "manually" by [dragging and dropping the firmware](https://www.raspberrypi.com/documentation/microcontrollers/micropython.html#drag-and-drop-micropython) file onto the Pico drive)
