@@ -1,4 +1,4 @@
-![](/media/mailbox_medium.png)
+![](media/mailbox_banner.png)
 
 # Mailbox
 _Johan Lundström - jl226ki_
@@ -73,8 +73,6 @@ __2 hours__<br>
 If you have my code, all the hardware and a mailbox and know how to flash code onto a Pico (or possess the ability to follow one of the many many [online tutorials and guides](https://www.raspberrypi.com/documentation/microcontrollers/micropython.html#:~:text=Push%20and%20hold%20the%20BOOTSEL,Your%20Pico%20will%20reboot.)) you can probably get this done in an hour or two.
 
 _(it took me significantly longer, but I was also prototyping and testing a lot of things along the way)_
-
-__TODO: picture of mailbox__<br>
 
 
 ### What different blinking (and buzzing) patterns mean
@@ -168,7 +166,7 @@ This has been omitted since the diagrams ☝️ offer more than enough clarity f
 It really isn't important which LEDs you use, as long as they are ballpark OK for 3.3-ish Volts we can get from the Pico.
 
 ### Assembly and sticking it in an actual mailbox
-__TODO: Stick it all into an actual mailbox__
+![](media/mailbox_rear.jpeg)
 
 ### Power draw, expected and actual (and adventures in power management)
 A pico (with WiFi) can draw as much as 0.5W at startup (depending on workload this tends to level out at about 0.15W).
@@ -392,6 +390,10 @@ Data retention in Home Assistant defaults to 10 days of historical data but this
 
 ## In the end
 _Instead of hiding pictures and videos down here, I have chosen to sprinkle them throughout the readme ☝️_<br>
+_I did, however, save the best for last =)_
+
+
+
 I have a mailbox that can tell me if mail has been delivered today or not. I can also see this information in Home Assistant and get notifications on my phone if I want to.
 Looking back I cannot help but feel like this kind of microcontroller is gross overkill for this project, but we need to also factor in speed of development, which is hard to beat for a project with a low low volume of one.
 
