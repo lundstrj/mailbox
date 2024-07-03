@@ -392,7 +392,9 @@ Data retention in Home Assistant defaults to 10 days of historical data but this
 _Instead of hiding pictures and videos down here, I have chosen to sprinkle them throughout the readme ☝️_<br>
 _I did, however, save the best for last =)_
 
-https://youtu.be/Li3eFQPlO-8
+_Please enjoy this video of the assembled (prototype) Mailbox (click to play)_
+[![Demo of the assembled Mailbox](https://img.youtube.com/vi/Li3eFQPlO-8/0.jpg)](https://www.youtube.com/watch?v=Li3eFQPlO-8)
+
 
 I have a mailbox that can tell me if mail has been delivered today or not. I can also see this information in Home Assistant and get notifications on my phone if I want to.
 Looking back I cannot help but feel like this kind of microcontroller is gross overkill for this project, but we need to also factor in speed of development, which is hard to beat for a project with a low low volume of one.
